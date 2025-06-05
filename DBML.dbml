@@ -1,0 +1,248 @@
+// E-Commerce Database Schema
+
+// Users and Authentication
+Table User {
+  User_ID int [pk]
+  email varchar [unique]
+  password varchar
+  first_name varchar
+  last_name varchar
+  phone_number varchar
+  role varchar
+  account_status varchar
+  birthday date
+}
+
+Table Address {
+  Address_ID int [pk]
+  User_ID int [ref: > User.User_ID]
+  street varchar
+  city varchar
+  state varchar
+  zip_code varchar
+}
+
+// Products and Categories
+Table Product {
+  Product_ID int [pk]
+  SKU varchar [unique]
+  product_name varchar
+  description text
+  price decimal
+  weight decimal
+  dimensions varchar
+  status varchar
+  category_id int [ref: > Category.Category_ID]
+  Discount_ID int [ref: > Discount.Discount_ID]
+}
+
+Table Category {
+  Category_ID int [pk]
+  name varchar
+  description text
+  parent_category_id int [ref: > Category.Category_ID]
+}
+
+// Inventory Management
+Table Product_Inventory {
+  Product_ID int [pk, ref: > Product.Product_ID]
+  Warehouse_ID int [pk, ref: > Warehouse.Warehouse_ID]
+  Quantity int
+  Minimum_Quantity int
+  Maximum_Quantity int
+  Last_Updated timestamp
+  status varchar
+}
+
+Table Warehouse {
+  Warehouse_ID int [pk]
+  Name varchar
+  Location varchar
+  status varchar
+}
+
+Table Inventory_Transaction {
+  Transaction_ID int [pk]
+  Product_ID int [ref: > Product.Product_ID]
+  Warehouse_ID int [ref: > Warehouse.Warehouse_ID]
+  Quantity int
+  Type varchar
+  Reference_Type varchar
+  Reference_ID int
+}
+
+// Shopping Cart
+Table Cart {
+  Cart_ID int [pk]
+  User_ID int [ref: > User.User_ID]
+}
+
+Table Cart_Item {
+  Cart_Item_ID int [pk]
+  Cart_ID int [ref: > Cart.Cart_ID]
+  Product_ID int [ref: > Product.Product_ID]
+  quantity int
+}
+
+// Wishlist
+Table Wishlist {
+  Wishlist_ID int [pk]
+  User_ID int [ref: > User.User_ID]
+}
+
+Table Wishlist_Item {
+  Wishlist_Item_ID int [pk]
+  Wishlist_ID int [ref: > Wishlist.Wishlist_ID]
+  Product_ID int [ref: > Product.Product_ID]
+}
+
+// Orders
+Table Order {
+  Order_ID int [pk]
+  User_ID int [ref: > User.User_ID]
+  order_date timestamp
+  total_price decimal
+  status varchar
+  Address_ID int [ref: > Address.Address_ID]
+  Discount_ID int [ref: > Discount.Discount_ID]
+}
+
+Table Order_Item {
+  Order_Item_ID int [pk]
+  Order_ID int [ref: > Order.Order_ID]
+  Product_ID int [ref: > Product.Product_ID]
+  quantity int
+  price decimal
+}
+
+// Shipment
+Table Shipment {
+  Shipment_ID int [pk]
+  Order_ID int [ref: > Order.Order_ID]
+  shipment_date timestamp
+  carrier varchar
+  tracking_number varchar
+  status varchar
+  Shipment_Address_ID int [ref: > Address.Address_ID]
+}
+
+// Payment
+Table Payment {
+  Payment_ID int [pk]
+  Order_ID int [ref: > Order.Order_ID]
+  payment_date timestamp
+  payment_method varchar
+  transaction_id varchar
+  amount decimal
+}
+
+// Discounts
+Table Discount {
+  Discount_ID int [pk]
+  value decimal
+  discount_type varchar
+  start_date timestamp
+  end_date timestamp
+  description text
+}
+
+Table User_Discount {
+  User_ID int [pk, ref: > User.User_ID]
+  Discount_ID int [pk, ref: > Discount.Discount_ID]
+}
+
+// Product Reviews and Comments
+Table Comment {
+  Comment_ID int [pk]
+  Product_ID int [ref: > Product.Product_ID]
+  User_ID int [ref: > User.User_ID]
+  text text
+  star int
+  likes_count int
+  dislikes_count int
+  reply_comment_ID int [ref: > Comment.Comment_ID]
+}
+
+// Returns
+Table Return_Request {
+  Return_ID int [pk]
+  Order_ID int [ref: > Order.Order_ID]
+  User_ID int [ref: > User.User_ID]
+  status varchar
+  Reason text
+  Refund_amount decimal
+  Tracking_Number varchar
+  shipment_status varchar
+}
+
+Table Return_Item {
+  Return_ID int [pk, ref: > Return_Request.Return_ID]
+  Order_Item_ID int [pk, ref: > Order_Item.Order_Item_ID]
+  Quantity int
+  status varchar
+  Price_adjustment decimal
+  Description text
+}
+
+// Bundles
+Table Bundle {
+  Bundle_ID int [pk]
+  Name varchar
+  Description text
+  status varchar
+}
+
+Table Bundle_Product {
+  Bundle_ID int [pk, ref: > Bundle.Bundle_ID]
+  Product_ID int [pk, ref: > Product.Product_ID]
+  Quantity int
+  Price_adjustment int
+}
+
+// Vendor
+Table Vendor {
+  Vendor_ID int [pk, ref: > User.User_ID]
+  Shop_Name varchar
+  Description text
+  Rating decimal
+  status varchar
+}
+
+Table Vendor_Product {
+  Vendor_ID int [pk, ref: > Vendor.Vendor_ID]
+  Product_ID int [pk, ref: > Product.Product_ID]
+}
+
+Table Vendor_Review {
+  Review_ID int [pk]
+  Vendor_ID int [ref: > Vendor.Vendor_ID]
+  User_ID int [ref: > User.User_ID]
+  Rating decimal
+  Comment text
+}
+
+// Support Tickets
+Table Ticket {
+  Ticket_ID int [pk]
+  User_ID int [ref: > User.User_ID]
+  type varchar
+  title varchar
+  status varchar
+  priority varchar
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table Message {
+  Message_ID int [pk]
+  Ticket_ID int [ref: > Ticket.Ticket_ID]
+  Sender_User_ID int [ref: > User.User_ID] // User who sent this message
+  content text
+  date timestamp
+}
+
+Table Ticket_Access {
+  Ticket_ID int [pk, ref: > Ticket.Ticket_ID]
+  User_ID int [pk, ref: > User.User_ID]
+  access_type varchar // 'read', 'write', 'admin'
+}
