@@ -1,0 +1,29 @@
+[
+  {
+    "model": "users.user",
+    "pk": 1,
+    "fields": {
+      "username": "customer1",
+      "password": "pbkdf2_sha256$260000$l4fNlT2W2gYx$jKx+1/n3R8wL+d7Hk/g0K5x+1/n3R8wL",
+      "email": "customer1@example.com",
+      "first_name": "علی",
+      "last_name": "محمدی",
+      "phone_number": "09123456789",
+      "birthday": "1990-01-01",
+      "is_staff": false,
+      "is_superuser": false,
+      "is_active": true
+    }
+  },
+  {
+    "model": "users.address",
+    "pk": 1,
+    "fields": {
+      "user": 1,
+      "street": "خیابان آزادی",
+      "city": "تهران",
+      "state": "تهران",
+      "zip_code": "1234567890"
+    }
+  }
+]

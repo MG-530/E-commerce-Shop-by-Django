@@ -1,0 +1,18 @@
+[
+  {
+    "model": "orders.cart",
+    "pk": 1,
+    "fields": {
+      "user": 1
+    }
+  },
+  {
+    "model": "orders.cartitem",
+    "pk": 1,
+    "fields": {
+      "cart": 1,
+      "product": 1,
+      "quantity": 1
+    }
+  }
+]
