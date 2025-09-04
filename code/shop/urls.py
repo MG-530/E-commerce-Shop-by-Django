@@ -16,6 +16,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from rest_framework.routers import DefaultRouter
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -23,4 +24,9 @@ urlpatterns = [
     path('api/users/', include('users.urls')),
     path('api/catalog/', include('catalog.urls')),
     path('api/orders/', include('orders.urls')),
+    path('api/inventory/', include('inventory.urls')),
+    path('api/support/', include('support.urls')),
+    path('api/vendors/', include('vendor.urls')),
+    path('api/wishlist/', include('wishlist.urls')),
+    path('api/returns/', include('return.urls')),
 ]
