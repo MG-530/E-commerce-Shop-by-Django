@@ -33,6 +33,17 @@ class Discount(models.Model):
     def __str__(self):
         return self.description
 
+class UserDiscount(models.Model):
+    # Specific discounts for individual users.
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    discount = models.ForeignKey(Discount, on_delete=models.CASCADE)
+
+    class Meta:
+        unique_together = ('user', 'discount')
+
+    def __str__(self):
+        return f"{self.user.username} has discount {self.discount.description}"
+
 class Product(ProductCommon):
     # Product model with foreign keys to Category and Discount.
     sku = models.CharField(max_length=50, unique=True)
