@@ -17,6 +17,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
+from django.views.generic import TemplateView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -29,4 +30,8 @@ urlpatterns = [
     path('api/vendors/', include('vendor.urls')),
     path('api/wishlist/', include('wishlist.urls')),
     path('api/returns/', include('return.urls')),
+    path('', TemplateView.as_view(template_name='index.html'), name='home'),
+    path('product-detail/', TemplateView.as_view(template_name='product_detail.html'), name='product_detail'),
+    path('cart/', TemplateView.as_view(template_name='cart.html'), name='cart'),
+    path('admin-panel/', TemplateView.as_view(template_name='admin_panel.html'), name='admin_panel'),
 ]
