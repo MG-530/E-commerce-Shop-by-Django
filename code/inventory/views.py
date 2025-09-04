@@ -1,3 +1,13 @@
-from django.shortcuts import render
+from rest_framework import viewsets
+from .models import Warehouse, ProductInventory
+from .serializers import WarehouseSerializer, ProductInventorySerializer
 
-# Create your views here.
+class WarehouseViewSet(viewsets.ModelViewSet):
+    # ViewSet for warehouses.
+    queryset = Warehouse.objects.all()
+    serializer_class = WarehouseSerializer
+
+class ProductInventoryViewSet(viewsets.ModelViewSet):
+    # ViewSet for product inventory.
+    queryset = ProductInventory.objects.all()
+    serializer_class = ProductInventorySerializer
