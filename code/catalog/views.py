@@ -1,18 +1,33 @@
 from rest_framework import viewsets
-from .models import Category, Product, Discount
-from .serializers import CategorySerializer, ProductSerializer, DiscountSerializer
+from .models import Category, Discount, Product, Comment, Bundle, BundleProduct
+from .serializers import CategorySerializer, DiscountSerializer, ProductSerializer, CommentSerializer, BundleSerializer, BundleProductSerializer
 
-class CategoryViewSet(viewsets.ReadOnlyModelViewSet):
-    # ViewSet for categories. Read-only for public access.
+class CategoryViewSet(viewsets.ModelViewSet):
+    # ViewSet for the Category model.
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
 
-class ProductViewSet(viewsets.ReadOnlyModelViewSet):
-    # ViewSet for products. Read-only for public access.
+class DiscountViewSet(viewsets.ModelViewSet):
+    # ViewSet for the Discount model.
+    queryset = Discount.objects.all()
+    serializer_class = DiscountSerializer
+
+class ProductViewSet(viewsets.ModelViewSet):
+    # ViewSet for the Product model.
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
 
-class DiscountViewSet(viewsets.ReadOnlyModelViewSet):
-    # ViewSet for discounts. Read-only for public access.
-    queryset = Discount.objects.all()
-    serializer_class = DiscountSerializer
+class CommentViewSet(viewsets.ModelViewSet):
+    # ViewSet for the Comment model.
+    queryset = Comment.objects.all()
+    serializer_class = CommentSerializer
+
+class BundleViewSet(viewsets.ModelViewSet):
+    # ViewSet for the Bundle model.
+    queryset = Bundle.objects.all()
+    serializer_class = BundleSerializer
+
+class BundleProductViewSet(viewsets.ModelViewSet):
+    # ViewSet for the BundleProduct model.
+    queryset = BundleProduct.objects.all()
+    serializer_class = BundleProductSerializer
