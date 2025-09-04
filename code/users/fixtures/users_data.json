@@ -3,26 +3,48 @@
     "model": "users.user",
     "pk": 1,
     "fields": {
-      "username": "customer1",
-      "password": "pbkdf2_sha256$260000$l4fNlT2W2gYx$jKx+1/n3R8wL+d7Hk/g0K5x+1/n3R8wL",
-      "email": "customer1@example.com",
-      "first_name": "علی",
-      "last_name": "محمدی",
+      "password": "pbkdf2_sha256$260000$8T3Z2W6H5S4S6M5F$e+fA4B3C2D1E5F6G7H8I9J0K1L2M3N4O5P6Q7R8S9T0U1V2W3X4Y5Z6",
+      "is_superuser": true,
+      "username": "admin",
+      "first_name": "Admin",
+      "last_name": "User",
+      "email": "admin@example.com",
+      "is_staff": true,
+      "is_active": true,
+      "date_joined": "2023-01-01T00:00:00Z",
       "phone_number": "09123456789",
-      "birthday": "1990-01-01",
-      "is_staff": false,
+      "role": "admin",
+      "account_status": "active",
+      "birthday": "1990-01-01"
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": 2,
+    "fields": {
+      "password": "pbkdf2_sha256$260000$8T3Z2W6H5S4S6M5F$e+fA4B3C2D1E5F6G7H8I9J0K1L2M3N4O5P6Q7R8S9T0U1V2W3X4Y5Z6",
       "is_superuser": false,
-      "is_active": true
+      "username": "testuser",
+      "first_name": "Test",
+      "last_name": "User",
+      "email": "testuser@example.com",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2023-01-02T00:00:00Z",
+      "phone_number": "09129876543",
+      "role": "user",
+      "account_status": "active",
+      "birthday": "1995-05-15"
     }
   },
   {
     "model": "users.address",
     "pk": 1,
     "fields": {
-      "user": 1,
-      "street": "خیابان آزادی",
-      "city": "تهران",
-      "state": "تهران",
+      "user": 2,
+      "street": "123 Main St",
+      "city": "Tehran",
+      "state": "Tehran",
       "zip_code": "1234567890"
     }
   }
