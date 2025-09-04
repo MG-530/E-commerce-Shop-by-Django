@@ -34,4 +34,5 @@ urlpatterns = [
     path('product-detail/', TemplateView.as_view(template_name='product_detail.html'), name='product_detail'),
     path('cart/', TemplateView.as_view(template_name='cart.html'), name='cart'),
     path('admin-panel/', TemplateView.as_view(template_name='admin_panel.html'), name='admin_panel'),
+    path('login/', TemplateView.as_view(template_name='login.html'), name='login'),
 ]
