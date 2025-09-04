@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ورود | ثبت نام</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <style>
+        @font-face {
+            font-family: 'Vazirmatn';
+            src: url('https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.0.0/fonts/webfonts/Vazirmatn-Regular.woff2') format('woff2');
+            font-weight: normal;
+            font-style: normal;
+        }
+        body {
+            font-family: 'Vazirmatn', sans-serif;
+            background-color: #f3f4f6;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 font-sans leading-normal tracking-normal">
+
+    <!-- Header -->
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+        <nav class="container mx-auto px-6 py-3 flex justify-between items-center">
+            <div class="text-2xl font-bold text-gray-800">
+                فروشگاه
+            </div>
+            <div class="flex items-center space-x-4">
+                <a href="/" class="text-gray-800 text-sm font-semibold mx-3">خانه</a>
+                <a href="/login/" class="text-gray-800 text-sm font-semibold mx-3">ورود</a>
+                <a href="/cart/" class="text-gray-800 text-sm font-semibold mx-3 relative">
+                    سبد خرید
+                    <span id="cart-count" class="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-red-100 transform translate-x-1/2 -translate-y-1/2 bg-red-600 rounded-full">0</span>
+                </a>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container mx-auto px-6 py-8">
+        <section id="login-register" class="flex items-center justify-center min-h-screen">
+            <div class="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
+                <h2 class="text-2xl font-bold mb-6 text-center" id="form-title">ورود</h2>
+                <form id="auth-form">
+                    <div class="mb-4 hidden" id="register-fields">
+                        <label for="first-name" class="block text-gray-700 text-sm font-bold mb-2">نام</label>
+                        <input type="text" id="first-name" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                        <label for="last-name" class="block text-gray-700 text-sm font-bold mb-2 mt-4">نام خانوادگی</label>
+                        <input type="text" id="last-name" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                        <label for="email" class="block text-gray-700 text-sm font-bold mb-2 mt-4">ایمیل</label>
+                        <input type="email" id="email" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    </div>
+                    <div class="mb-4">
+                        <label for="username" class="block text-gray-700 text-sm font-bold mb-2">نام کاربری</label>
+                        <input type="text" id="username" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+                    </div>
+                    <div class="mb-6">
+                        <label for="password" class="block text-gray-700 text-sm font-bold mb-2">رمز عبور</label>
+                        <input type="password" id="password" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline" required>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <button type="submit" id="submit-btn" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                            ورود
+                        </button>
+                    </div>
+                </form>
+                <div class="mt-4 text-center">
+                    <button id="toggle-auth-btn" class="text-blue-500 hover:text-blue-800 text-sm">
+                        ثبت نام
+                    </button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Message Box -->
+    <div id="message-box" class="fixed bottom-4 left-1/2 -translate-x-1/2 bg-gray-800 text-white py-2 px-4 rounded-lg shadow-lg hidden">
+        <p id="message-text"></p>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'http://127.0.0.1:8000/api';
+        const authForm = document.getElementById('auth-form');
+        const formTitle = document.getElementById('form-title');
+        const submitBtn = document.getElementById('submit-btn');
+        const toggleAuthBtn = document.getElementById('toggle-auth-btn');
+        const registerFields = document.getElementById('register-fields');
+        const messageBox = document.getElementById('message-box');
+        const messageText = document.getElementById('message-text');
+        
+        let isLogin = true;
+
+        const showMessage = (text) => {
+            messageText.textContent = text;
+            messageBox.classList.remove('hidden');
+            setTimeout(() => {
+                messageBox.classList.add('hidden');
+            }, 3000);
+        };
+
+        const getCookie = (name) => {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; ${name}=`);
+            if (parts.length === 2) return parts.pop().split(';').shift();
+        };
+        const csrfToken = getCookie('csrftoken');
+
+        toggleAuthBtn.addEventListener('click', () => {
+            isLogin = !isLogin;
+            if (isLogin) {
+                formTitle.textContent = 'ورود';
+                submitBtn.textContent = 'ورود';
+                toggleAuthBtn.textContent = 'ثبت نام';
+                registerFields.classList.add('hidden');
+            } else {
+                formTitle.textContent = 'ثبت نام';
+                submitBtn.textContent = 'ثبت نام';
+                toggleAuthBtn.textContent = 'ورود';
+                registerFields.classList.remove('hidden');
+            }
+        });
+
+        authForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            if (isLogin) {
+                // Login
+                try {
+                    const response = await axios.post(`${API_BASE_URL}/users/api-token-auth/`, { username, password }, {
+                        headers: {
+                            'X-CSRFToken': csrfToken
+                        }
+                    });
+                    localStorage.setItem('authToken', response.data.token);
+                    localStorage.setItem('userId', response.data.user_id);
+                    showMessage('ورود موفقیت‌آمیز بود!');
+                    window.location.href = '/';
+                } catch (error) {
+                    console.error('Login error:', error);
+                    showMessage('ورود ناموفق بود. لطفاً نام کاربری و رمز عبور را بررسی کنید.');
+                }
+            } else {
+                // Register
+                const firstName = document.getElementById('first-name').value;
+                const lastName = document.getElementById('last-name').value;
+                const email = document.getElementById('email').value;
+
+                try {
+                    await axios.post(`${API_BASE_URL}/users/users/`, {
+                        username,
+                        password,
+                        first_name: firstName,
+                        last_name: lastName,
+                        email
+                    }, {
+                        headers: {
+                            'X-CSRFToken': csrfToken
+                        }
+                    });
+                    showMessage('ثبت نام موفقیت‌آمیز بود! حالا می‌توانید وارد شوید.');
+                    isLogin = true;
+                    formTitle.textContent = 'ورود';
+                    submitBtn.textContent = 'ورود';
+                    toggleAuthBtn.textContent = 'ثبت نام';
+                    registerFields.classList.add('hidden');
+                } catch (error) {
+                    console.error('Registration error:', error);
+                    showMessage('ثبت نام ناموفق بود. لطفاً اطلاعات را بررسی کنید.');
+                }
+            }
+        });
+    </script>
+</body>
+</html>

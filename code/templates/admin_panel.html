@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>پنل مدیریت</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <style>
+        @font-face {
+            font-family: 'Vazirmatn';
+            src: url('https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.0.0/fonts/webfonts/Vazirmatn-Regular.woff2') format('woff2');
+            font-weight: normal;
+            font-style: normal;
+        }
+        body {
+            font-family: 'Vazirmatn', sans-serif;
+            background-color: #f3f4f6;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 font-sans leading-normal tracking-normal">
+    
+    <!-- Admin Header -->
+    <header class="bg-gray-800 shadow-sm sticky top-0 z-50">
+        <nav class="container mx-auto px-6 py-3 flex justify-between items-center">
+            <div class="text-2xl font-bold text-white">
+                پنل مدیریت فروشگاه
+            </div>
+            <div class="flex items-center space-x-4">
+                <a href="/admin-panel/?page=products" class="text-gray-300 text-sm font-semibold mx-3">محصولات</a>
+                <a href="/admin-panel/?page=orders" class="text-gray-300 text-sm font-semibold mx-3">سفارشات</a>
+                <a href="/admin-panel/?page=users" class="text-gray-300 text-sm font-semibold mx-3">کاربران</a>
+                <button id="logout-btn" class="text-gray-300 text-sm font-semibold mx-3">خروج</button>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container mx-auto px-6 py-8">
+        
+        <!-- Admin Login Page -->
+        <section id="admin-login" class="flex items-center justify-center min-h-screen hidden">
+            <div class="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
+                <h2 class="text-2xl font-bold mb-6 text-center">ورود به پنل مدیریت</h2>
+                <form id="admin-login-form">
+                    <div class="mb-4">
+                        <label for="admin-username" class="block text-gray-700 text-sm font-bold mb-2">نام کاربری</label>
+                        <input type="text" id="admin-username" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+                    </div>
+                    <div class="mb-6">
+                        <label for="admin-password" class="block text-gray-700 text-sm font-bold mb-2">رمز عبور</label>
+                        <input type="password" id="admin-password" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline" required>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                            ورود
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+        <!-- Admin Products Management -->
+        <section id="products" class="py-8 hidden">
+            <h2 class="text-3xl font-bold text-gray-800 text-center mb-8">مدیریت محصولات</h2>
+            <div class="bg-white p-8 rounded-lg shadow-lg">
+                <table class="min-w-full leading-normal">
+                    <thead>
+                        <tr>
+                            <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">شناسه</th>
+                            <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">نام محصول</th>
+                            <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">قیمت</th>
+                            <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">وضعیت</th>
+                        </tr>
+                    </thead>
+                    <tbody id="products-table-body">
+                        <!-- Products will be loaded here by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Admin Orders Management -->
+        <section id="orders" class="py-8 hidden">
+            <h2 class="text-3xl font-bold text-gray-800 text-center mb-8">مدیریت سفارشات</h2>
+            <div class="bg-white p-8 rounded-lg shadow-lg">
+                <table class="min-w-full leading-normal">
+                    <thead>
+                        <tr>
+                            <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">شناسه سفارش</th>
+                            <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">کاربر</th>
+                            <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">قیمت کل</th>
+                            <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">وضعیت</th>
+                        </tr>
+                    </thead>
+                    <tbody id="orders-table-body">
+                        <!-- Orders will be loaded here by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Admin Users Management -->
+        <section id="users" class="py-8 hidden">
+            <h2 class="text-3xl font-bold text-gray-800 text-center mb-8">مدیریت کاربران</h2>
+            <div class="bg-white p-8 rounded-lg shadow-lg">
+                <table class="min-w-full leading-normal">
+                    <thead>
+                        <tr>
+                            <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">شناسه</th>
+                            <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">نام کاربری</th>
+                            <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">ایمیل</th>
+                            <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">وضعیت</th>
+                        </tr>
+                    </thead>
+                    <tbody id="users-table-body">
+                        <!-- Users will be loaded here by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+    
+    <!-- Message Box -->
+    <div id="message-box" class="fixed bottom-4 left-1/2 -translate-x-1/2 bg-gray-800 text-white py-2 px-4 rounded-lg shadow-lg hidden">
+        <p id="message-text"></p>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'http://127.0.0.1:8000/api';
+        const productsSection = document.getElementById('products');
+        const ordersSection = document.getElementById('orders');
+        const usersSection = document.getElementById('users');
+        const productsTableBody = document.getElementById('products-table-body');
+        const ordersTableBody = document.getElementById('orders-table-body');
+        const usersTableBody = document.getElementById('users-table-body');
+        const adminLoginForm = document.getElementById('admin-login-form');
+        const adminLoginSection = document.getElementById('admin-login');
+        const logoutBtn = document.getElementById('logout-btn');
+
+        let authToken = localStorage.getItem('adminAuthToken');
+
+        const showMessage = (text) => {
+            const messageBox = document.getElementById('message-box');
+            const messageText = document.getElementById('message-text');
+            messageText.textContent = text;
+            messageBox.classList.remove('hidden');
+            setTimeout(() => {
+                messageBox.classList.add('hidden');
+            }, 3000);
+        };
+        const getCookie = (name) => {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; ${name}=`);
+            if (parts.length === 2) return parts.pop().split(';').shift();
+        };
+        const csrfToken = getCookie('csrftoken');
+        if (authToken) {
+            axios.defaults.headers.common['Authorization'] = `Token ${authToken}`;
+        }
+        axios.defaults.headers.common['X-CSRFToken'] = csrfToken;
+        
+        const navigateTo = (page) => {
+            adminLoginSection.classList.add('hidden');
+            productsSection.classList.add('hidden');
+            ordersSection.classList.add('hidden');
+            usersSection.classList.add('hidden');
+
+            if (page === 'products') {
+                productsSection.classList.remove('hidden');
+                fetchProducts();
+            } else if (page === 'orders') {
+                ordersSection.classList.remove('hidden');
+                fetchOrders();
+            } else if (page === 'users') {
+                usersSection.classList.remove('hidden');
+                fetchUsers();
+            } else if (page === 'login') {
+                adminLoginSection.classList.remove('hidden');
+            }
+        };
+
+        const checkAuthAndNavigate = () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const page = urlParams.get('page');
+            if (authToken) {
+                if (page) {
+                    navigateTo(page);
+                } else {
+                    navigateTo('products'); // Default to products page
+                }
+            } else {
+                navigateTo('login');
+            }
+        };
+
+        adminLoginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const username = document.getElementById('admin-username').value;
+            const password = document.getElementById('admin-password').value;
+
+            try {
+                const response = await axios.post(`${API_BASE_URL}/api-token-auth/`, { username, password });
+                authToken = response.data.token;
+                localStorage.setItem('adminAuthToken', authToken);
+                axios.defaults.headers.common['Authorization'] = `Token ${authToken}`;
+                showMessage('ورود به پنل مدیریت موفقیت‌آمیز بود!');
+                checkAuthAndNavigate();
+            } catch (error) {
+                console.error(error);
+                showMessage('ورود ناموفق بود.');
+            }
+        });
+
+        logoutBtn.addEventListener('click', () => {
+            localStorage.removeItem('adminAuthToken');
+            authToken = null;
+            showMessage('با موفقیت خارج شدید.');
+            navigateTo('login');
+        });
+
+        const fetchProducts = async () => {
+            try {
+                const response = await axios.get(`${API_BASE_URL}/catalog/products/`);
+                productsTableBody.innerHTML = '';
+                response.data.forEach(product => {
+                    const row = document.createElement('tr');
+                    row.className = 'bg-white border-b hover:bg-gray-50';
+                    row.innerHTML = `
+                        <td class="px-5 py-5 text-sm">${product.id}</td>
+                        <td class="px-5 py-5 text-sm">${product.product_name}</td>
+                        <td class="px-5 py-5 text-sm">Toman ${product.price}</td>
+                        <td class="px-5 py-5 text-sm">${product.status}</td>
+                    `;
+                    productsTableBody.appendChild(row);
+                });
+            } catch (error) {
+                console.error('Error fetching products:', error);
+                showMessage('خطا در دریافت محصولات.');
+            }
+        };
+
+        const fetchOrders = async () => {
+            try {
+                const response = await axios.get(`${API_BASE_URL}/orders/orders/`);
+                ordersTableBody.innerHTML = '';
+                response.data.forEach(order => {
+                    const row = document.createElement('tr');
+                    row.className = 'bg-white border-b hover:bg-gray-50';
+                    row.innerHTML = `
+                        <td class="px-5 py-5 text-sm">${order.id}</td>
+                        <td class="px-5 py-5 text-sm">${order.user}</td>
+                        <td class="px-5 py-5 text-sm">Toman ${order.total_price}</td>
+                        <td class="px-5 py-5 text-sm">${order.status}</td>
+                    `;
+                    ordersTableBody.appendChild(row);
+                });
+            } catch (error) {
+                console.error('Error fetching orders:', error);
+                showMessage('خطا در دریافت سفارشات.');
+            }
+        };
+
+        const fetchUsers = async () => {
+            try {
+                const response = await axios.get(`${API_BASE_URL}/users/users/`);
+                usersTableBody.innerHTML = '';
+                response.data.forEach(user => {
+                    const row = document.createElement('tr');
+                    row.className = 'bg-white border-b hover:bg-gray-50';
+                    row.innerHTML = `
+                        <td class="px-5 py-5 text-sm">${user.id}</td>
+                        <td class="px-5 py-5 text-sm">${user.username}</td>
+                        <td class="px-5 py-5 text-sm">${user.email}</td>
+                        <td class="px-5 py-5 text-sm">${user.account_status}</td>
+                    `;
+                    usersTableBody.appendChild(row);
+                });
+            } catch (error) {
+                console.error('Error fetching users:', error);
+                showMessage('خطا در دریافت کاربران.');
+            }
+        };
+
+        checkAuthAndNavigate();
+    </script>
+</body>
+</html>

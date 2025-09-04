@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>جزئیات محصول</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <style>
+        @font-face {
+            font-family: 'Vazirmatn';
+            src: url('https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.0.0/fonts/webfonts/Vazirmatn-Regular.woff2') format('woff2');
+            font-weight: normal;
+            font-style: normal;
+        }
+        body {
+            font-family: 'Vazirmatn', sans-serif;
+            background-color: #f3f4f6;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 font-sans leading-normal tracking-normal">
+
+    <!-- Header -->
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+        <nav class="container mx-auto px-6 py-3 flex justify-between items-center">
+            <div class="text-2xl font-bold text-gray-800">
+                فروشگاه
+            </div>
+            <div class="flex items-center space-x-4">
+                <a href="/" class="text-gray-800 text-sm font-semibold mx-3">خانه</a>
+                <a href="/login/" class="text-gray-800 text-sm font-semibold mx-3">ورود</a>
+                <a href="/cart/" class="text-gray-800 text-sm font-semibold mx-3 relative">
+                    سبد خرید
+                    <span id="cart-count" class="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-red-100 transform translate-x-1/2 -translate-y-1/2 bg-red-600 rounded-full">0</span>
+                </a>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container mx-auto px-6 py-8">
+        <section id="product-detail">
+            <button id="back-to-home" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded mb-6">بازگشت</button>
+            <div id="product-detail-content" class="bg-white p-8 rounded-lg shadow-lg">
+                <!-- Product details will be loaded here by JavaScript -->
+            </div>
+        </section>
+    </main>
+
+    <!-- Message Box -->
+    <div id="message-box" class="fixed bottom-4 left-1/2 -translate-x-1/2 bg-gray-800 text-white py-2 px-4 rounded-lg shadow-lg hidden">
+        <p id="message-text"></p>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'http://127.0.0.1:8000/api';
+        const productDetailContent = document.getElementById('product-detail-content');
+        const backToHomeBtn = document.getElementById('back-to-home');
+        const messageBox = document.getElementById('message-box');
+        const messageText = document.getElementById('message-text');
+        const cartCountSpan = document.getElementById('cart-count');
+
+        let authToken = localStorage.getItem('authToken');
+        let userId = localStorage.getItem('userId');
+
+        const showMessage = (text) => {
+            messageText.textContent = text;
+            messageBox.classList.remove('hidden');
+            setTimeout(() => {
+                messageBox.classList.add('hidden');
+            }, 3000);
+        };
+        const getCookie = (name) => {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; ${name}=`);
+            if (parts.length === 2) return parts.pop().split(';').shift();
+        };
+        const csrfToken = getCookie('csrftoken');
+        if (authToken) {
+            axios.defaults.headers.common['Authorization'] = `Token ${authToken}`;
+        }
+        axios.defaults.headers.common['X-CSRFToken'] = csrfToken;
+        
+        const getProductIdFromUrl = () => {
+            const params = new URLSearchParams(window.location.search);
+            return params.get('id');
+        };
+
+        const fetchProductDetails = async () => {
+            const productId = getProductIdFromUrl();
+            if (!productId) {
+                showMessage('شناسه محصول نامعتبر است.');
+                window.location.href = '/';
+                return;
+            }
+
+            try {
+                const response = await axios.get(`${API_BASE_URL}/catalog/products/${productId}/`);
+                const product = response.data;
+                productDetailContent.innerHTML = `
+                    <div class="flex flex-col md:flex-row items-center md:items-start">
+                        <div class="bg-gray-200 h-64 w-64 rounded-lg flex-shrink-0 mb-6 md:mb-0 md:ml-6">
+                            
+                        </div>
+                        <div class="flex-grow">
+                            <h1 class="text-4xl font-bold mb-4">${product.product_name}</h1>
+                            <p class="text-gray-700 text-lg mb-4">${product.description}</p>
+                            <p class="text-2xl font-bold text-gray-900 mb-2">قیمت: Toman ${product.price}</p>
+                            <p class="text-gray-600 mb-2">وزن: ${product.weight} کیلوگرم</p>
+                            <p class="text-gray-600 mb-6">ابعاد: ${product.dimensions}</p>
+                            <button class="add-to-cart-btn bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg">
+                                افزودن به سبد خرید
+                            </button>
+                        </div>
+                    </div>
+                `;
+                document.querySelector('.add-to-cart-btn').addEventListener('click', () => {
+                    addToCart(product.id, 1);
+                });
+            } catch (error) {
+                console.error('Error fetching product details:', error);
+                showMessage('خطا در دریافت اطلاعات محصول.');
+                window.location.href = '/';
+            }
+        };
+
+        const addToCart = async (productId, quantity) => {
+            if (!authToken) {
+                showMessage('لطفاً ابتدا وارد شوید.');
+                window.location.href = '/login/';
+                return;
+            }
+
+            try {
+                const cartResponse = await axios.get(`${API_BASE_URL}/orders/carts/?user=${userId}`);
+                let cartId;
+                if (cartResponse.data.length === 0) {
+                    const newCartResponse = await axios.post(`${API_BASE_URL}/orders/carts/`, { user: userId });
+                    cartId = newCartResponse.data.id;
+                } else {
+                    cartId = cartResponse.data[0].id;
+                }
+
+                const cartItemsResponse = await axios.get(`${API_BASE_URL}/orders/cart-items/?cart=${cartId}&product=${productId}`);
+                if (cartItemsResponse.data.length > 0) {
+                    const existingItem = cartItemsResponse.data[0];
+                    await axios.patch(`${API_BASE_URL}/orders/cart-items/${existingItem.id}/`, { quantity: existingItem.quantity + quantity });
+                } else {
+                    await axios.post(`${API_BASE_URL}/orders/cart-items/`, { cart: cartId, product: productId, quantity: quantity });
+                }
+                showMessage('محصول به سبد خرید اضافه شد!');
+                fetchCartCount();
+            } catch (error) {
+                console.error('Error adding to cart:', error);
+                showMessage('خطا در افزودن به سبد خرید.');
+            }
+        };
+
+        const fetchCartCount = async () => {
+            if (!authToken) return;
+            try {
+                const response = await axios.get(`${API_BASE_URL}/orders/carts/?user=${userId}`);
+                if (response.data.length > 0) {
+                    const cart = response.data[0];
+                    const cartItemsResponse = await axios.get(`${API_BASE_URL}/orders/cart-items/?cart=${cart.id}`);
+                    cartCountSpan.textContent = cartItemsResponse.data.length;
+                }
+            } catch (error) {
+                console.error('Error fetching cart count:', error);
+            }
+        };
+
+        backToHomeBtn.addEventListener('click', () => {
+            window.location.href = '/';
+        });
+
+        fetchProductDetails();
+        if(authToken) fetchCartCount();
+    </script>
+</body>
+</html>
