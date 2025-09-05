@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Details - E-Commerce Store</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="nav-brand">
+                <h1><a href="index.html">ShopHub</a></h1>
+            </div>
+            <nav class="nav-menu">
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="cart.html">Cart (<span id="cart-count">0</span>)</a></li>
+                    <li><a href="orders.html">Orders</a></li>
+                    <li><a href="support.html">Support</a></li>
+                    <li id="auth-menu">
+                        <a href="login.html" id="login-link">Login</a>
+                        <a href="#" id="logout-link" style="display: none;">Logout</a>
+                    </li>
+                </ul>
+            </nav>
+            <div class="mobile-menu-toggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </header>
+
+    <main class="main">
+        <div class="container">
+            <nav class="breadcrumb">
+                <a href="index.html">Home</a> > <span id="breadcrumb-category">Category</span> > <span id="breadcrumb-product">Product</span>
+            </nav>
+
+            <div class="product-detail" id="product-detail">
+                <div class="loading" id="loading">Loading product...</div>
+                <!-- Product details will be loaded here -->
+            </div>
+
+            <section class="product-comments" id="product-comments">
+                <h3>Customer Reviews</h3>
+                <div class="comments-list" id="comments-list">
+                    <!-- Comments will be loaded here -->
+                </div>
+                
+                <div class="add-comment" id="add-comment-section" style="display: none;">
+                    <h4>Add Your Review</h4>
+                    <form id="comment-form">
+                        <div class="rating-input">
+                            <label>Rating:</label>
+                            <div class="star-rating">
+                                <input type="radio" name="rating" value="5" id="star5">
+                                <label for="star5">★</label>
+                                <input type="radio" name="rating" value="4" id="star4">
+                                <label for="star4">★</label>
+                                <input type="radio" name="rating" value="3" id="star3">
+                                <label for="star3">★</label>
+                                <input type="radio" name="rating" value="2" id="star2">
+                                <label for="star2">★</label>
+                                <input type="radio" name="rating" value="1" id="star1">
+                                <label for="star1">★</label>
+                            </div>
+                        </div>
+                        <textarea name="comment" placeholder="Write your review..." required></textarea>
+                        <button type="submit">Submit Review</button>
+                    </form>
+                </div>
+            </section>
+
+            <section class="related-products" id="related-products">
+                <h3>Related Products</h3>
+                <div class="products-grid" id="related-products-grid">
+                    <!-- Related products will be loaded here -->
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2024 ShopHub. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="js/api.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/cart.js"></script>
+    <script>
+        let currentProduct = null;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            initAuth();
+            updateCartCount();
+            loadProduct();
+            
+            // Mobile menu toggle
+            document.querySelector('.mobile-menu-toggle').addEventListener('click', function() {
+                document.querySelector('.nav-menu').classList.toggle('active');
+            });
+
+            // Comment form submission
+            document.getElementById('comment-form').addEventListener('submit', handleCommentSubmit);
+        });
+
+        async function loadProduct() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const productId = urlParams.get('id');
+            
+            if (!productId) {
+                document.getElementById('loading').textContent = 'Product not found';
+                return;
+            }
+
+            try {
+                document.getElementById('loading').style.display = 'block';
+                
+                const product = await apiCall(`/api/catalog/products/${productId}/`);
+                currentProduct = product;
+                displayProduct(product);
+                loadComments(productId);
+                loadRelatedProducts(product.category);
+                
+                document.getElementById('loading').style.display = 'none';
+            } catch (error) {
+                console.error('Error loading product:', error);
+                document.getElementById('loading').textContent = 'Error loading product';
+            }
+        }
+
+        function displayProduct(product) {
+            const productDetail = document.getElementById('product-detail');
+            
+            // Update breadcrumb
+            document.getElementById('breadcrumb-product').textContent = product.name;
+            
+            productDetail.innerHTML = `
+                <div class="product-images">
+                    <div class="main-image">
+                        <img src="${product.image || 'images/placeholder.jpg'}" alt="${product.name}" id="main-product-image">
+                    </div>
+                    <div class="thumbnail-images">
+                        <img src="${product.image || 'images/placeholder.jpg'}" alt="${product.name}" class="thumbnail active" onclick="changeMainImage(this.src)">
+                        <!-- Additional thumbnails would go here -->
+                    </div>
+                </div>
+                
+                <div class="product-info">
+                    <h1 class="product-title">${product.name}</h1>
+                    <div class="product-rating">
+                        <div class="stars">★★★★☆</div>
+                        <span class="rating-count">(${product.comment_count || 0} reviews)</span>
+                    </div>
+                    
+                    <div class="product-price">
+                        <span class="current-price">$${product.price}</span>
+                        ${product.original_price && product.original_price > product.price ? 
+                            `<span class="original-price">$${product.original_price}</span>` : ''}
+                    </div>
+                    
+                    <div class="product-description">
+                        <h3>Description</h3>
+                        <p>${product.description}</p>
+                    </div>
+                    
+                    <div class="product-details">
+                        <h3>Product Details</h3>
+                        <ul>
+                            <li><strong>SKU:</strong> ${product.sku || 'N/A'}</li>
+                            <li><strong>Category:</strong> ${product.category_name || 'N/A'}</li>
+                            <li><strong>Availability:</strong> ${product.stock_quantity > 0 ? 'In Stock' : 'Out of Stock'}</li>
+                            <li><strong>Stock:</strong> ${product.stock_quantity || 0} units</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="product-actions">
+                        <div class="quantity-selector">
+                            <label for="quantity">Quantity:</label>
+                            <div class="quantity-controls">
+                                <button type="button" onclick="changeQuantity(-1)">-</button>
+                                <input type="number" id="quantity" value="1" min="1" max="${product.stock_quantity}">
+                                <button type="button" onclick="changeQuantity(1)">+</button>
+                            </div>
+                        </div>
+                        
+                        <div class="action-buttons">
+                            <button class="btn-add-cart ${product.stock_quantity <= 0 ? 'disabled' : ''}" 
+                                    onclick="addProductToCart()" 
+                                    ${product.stock_quantity <= 0 ? 'disabled' : ''}>
+                                ${product.stock_quantity <= 0 ? 'Out of Stock' : 'Add to Cart'}
+                            </button>
+                            <button class="btn-wishlist" onclick="addToWishlist(${product.id})">
+                                Add to Wishlist ♡
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        async function loadComments(productId) {
+            try {
+                const comments = await apiCall(`/api/catalog/comments/?product=${productId}`);
+                displayComments(comments.results);
+                
+                // Show add comment section if user is authenticated
+                if (isAuthenticated()) {
+                    document.getElementById('add-comment-section').style.display = 'block';
+                }
+            } catch (error) {
+                console.error('Error loading comments:', error);
+            }
+        }
+
+        function displayComments(comments) {
+            const commentsList = document.getElementById('comments-list');
+            
+            if (comments.length === 0) {
+                commentsList.innerHTML = '<p>No reviews yet. Be the first to review this product!</p>';
+                return;
+            }
+            
+            commentsList.innerHTML = comments.map(comment => `
+                <div class="comment">
+                    <div class="comment-header">
+                        <div class="comment-author">${comment.user_name || 'Anonymous'}</div>
+                        <div class="comment-rating">${'★'.repeat(comment.rating)}${'☆'.repeat(5 - comment.rating)}</div>
+                        <div class="comment-date">${new Date(comment.created_at).toLocaleDateString()}</div>
+                    </div>
+                    <div class="comment-content">${comment.content}</div>
+                </div>
+            `).join('');
+        }
+
+        async function loadRelatedProducts(categoryId) {
+            if (!categoryId) return;
+            
+            try {
+                const products = await apiCall(`/api/catalog/products/?category=${categoryId}&limit=4`);
+                const relatedGrid = document.getElementById('related-products-grid');
+                
+                relatedGrid.innerHTML = products.results
+                    .filter(p => p.id !== currentProduct.id)
+                    .slice(0, 4)
+                    .map(product => `
+                        <div class="product-card">
+                            <div class="product-image">
+                                <img src="${product.image || 'images/placeholder.jpg'}" alt="${product.name}">
+                                <div class="product-overlay">
+                                    <button class="btn-quick-view" onclick="viewProduct(${product.id})">View</button>
+                                </div>
+                            </div>
+                            <div class="product-info">
+                                <h4>${product.name}</h4>
+                                <div class="product-price">$${product.price}</div>
+                                <button class="btn-add-cart" onclick="addToCart(${product.id}, '${product.name}', ${product.price})">
+                                    Add to Cart
+                                </button>
+                            </div>
+                        </div>
+                    `).join('');
+            } catch (error) {
+                console.error('Error loading related products:', error);
+            }
+        }
+
+        function changeMainImage(src) {
+            document.getElementById('main-product-image').src = src;
+            
+            // Update active thumbnail
+            document.querySelectorAll('.thumbnail').forEach(thumb => thumb.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+
+        function changeQuantity(delta) {
+            const quantityInput = document.getElementById('quantity');
+            const currentValue = parseInt(quantityInput.value);
+            const newValue = currentValue + delta;
+            const maxValue = parseInt(quantityInput.max);
+            
+            if (newValue >= 1 && newValue <= maxValue) {
+                quantityInput.value = newValue;
+            }
+        }
+
+        function addProductToCart() {
+            if (!currentProduct) return;
+            
+            const quantity = parseInt(document.getElementById('quantity').value);
+            addToCart(currentProduct.id, currentProduct.name, currentProduct.price, quantity);
+        }
+
+        async function handleCommentSubmit(e) {
+            e.preventDefault();
+            
+            if (!isAuthenticated()) {
+                alert('Please login to submit a review');
+                return;
+            }
+            
+            const formData = new FormData(e.target);
+            const rating = formData.get('rating');
+            const content = formData.get('comment');
+            
+            if (!rating) {
+                alert('Please select a rating');
+                return;
+            }
+            
+            try {
+                await apiCall('/api/catalog/comments/', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        product: currentProduct.id,
+                        rating: parseInt(rating),
+                        content: content
+                    })
+                });
+                
+                alert('Review submitted successfully!');
+                e.target.reset();
+                loadComments(currentProduct.id);
+            } catch (error) {
+                console.error('Error submitting comment:', error);
+                alert('Error submitting review');
+            }
+        }
+
+        function viewProduct(productId) {
+            window.location.href = `product.html?id=${productId}`;
+        }
+
+        async function addToWishlist(productId) {
+            if (!isAuthenticated()) {
+                alert('Please login to add items to wishlist');
+                return;
+            }
+            
+            try {
+                await apiCall('/api/wishlist/', {
+                    method: 'POST',
+                    body: JSON.stringify({ product: productId })
+                });
+                alert('Added to wishlist!');
+            } catch (error) {
+                console.error('Error adding to wishlist:', error);
+                alert('Error adding to wishlist');
+            }
+        }
+    </script>
+</body>
+</html>
+

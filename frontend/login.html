@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - E-Commerce Store</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="nav-brand">
+                <h1><a href="index.html">ShopHub</a></h1>
+            </div>
+            <nav class="nav-menu">
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="cart.html">Cart (<span id="cart-count">0</span>)</a></li>
+                    <li><a href="orders.html">Orders</a></li>
+                    <li><a href="support.html">Support</a></li>
+                    <li><a href="login.html" class="active">Login</a></li>
+                </ul>
+            </nav>
+            <div class="mobile-menu-toggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </header>
+
+    <main class="main">
+        <div class="container">
+            <div class="auth-container">
+                <div class="auth-tabs">
+                    <button class="tab-btn active" onclick="showTab('login')">Login</button>
+                    <button class="tab-btn" onclick="showTab('register')">Register</button>
+                </div>
+
+                <!-- Login Form -->
+                <div class="auth-form" id="login-form">
+                    <h2>Welcome Back</h2>
+                    <p>Sign in to your account</p>
+                    
+                    <form id="login-form-element">
+                        <div class="form-group">
+                            <label for="login-email">Email</label>
+                            <input type="email" id="login-email" name="email" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="login-password">Password</label>
+                            <input type="password" id="login-password" name="password" required>
+                        </div>
+                        
+                        <div class="form-options">
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="remember">
+                                <span>Remember me</span>
+                            </label>
+                            <a href="#" class="forgot-password">Forgot password?</a>
+                        </div>
+                        
+                        <button type="submit" class="btn-auth">Sign In</button>
+                    </form>
+                    
+                    <div class="auth-divider">
+                        <span>or</span>
+                    </div>
+                    
+                    <div class="social-auth">
+                        <button class="btn-social google">
+                            <span>Continue with Google</span>
+                        </button>
+                        <button class="btn-social facebook">
+                            <span>Continue with Facebook</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Register Form -->
+                <div class="auth-form" id="register-form" style="display: none;">
+                    <h2>Create Account</h2>
+                    <p>Join us today</p>
+                    
+                    <form id="register-form-element">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="register-first-name">First Name</label>
+                                <input type="text" id="register-first-name" name="first_name" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="register-last-name">Last Name</label>
+                                <input type="text" id="register-last-name" name="last_name" required>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="register-username">Username</label>
+                            <input type="text" id="register-username" name="username" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="register-email">Email</label>
+                            <input type="email" id="register-email" name="email" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="register-password">Password</label>
+                            <input type="password" id="register-password" name="password" required>
+                            <div class="password-strength">
+                                <div class="strength-bar">
+                                    <div class="strength-fill"></div>
+                                </div>
+                                <span class="strength-text">Password strength</span>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="register-confirm-password">Confirm Password</label>
+                            <input type="password" id="register-confirm-password" name="confirm_password" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="register-phone">Phone Number (Optional)</label>
+                            <input type="tel" id="register-phone" name="phone">
+                        </div>
+                        
+                        <div class="form-options">
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="terms" required>
+                                <span>I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a></span>
+                            </label>
+                        </div>
+                        
+                        <div class="form-options">
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="newsletter">
+                                <span>Subscribe to our newsletter for updates and offers</span>
+                            </label>
+                        </div>
+                        
+                        <button type="submit" class="btn-auth">Create Account</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2024 ShopHub. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="js/api.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/cart.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check if user is already logged in
+            if (isAuthenticated()) {
+                window.location.href = 'index.html';
+                return;
+            }
+            
+            updateCartCount();
+            
+            // Mobile menu toggle
+            document.querySelector('.mobile-menu-toggle').addEventListener('click', function() {
+                document.querySelector('.nav-menu').classList.toggle('active');
+            });
+
+            // Form submissions
+            document.getElementById('login-form-element').addEventListener('submit', handleLogin);
+            document.getElementById('register-form-element').addEventListener('submit', handleRegister);
+            
+            // Password strength checker
+            document.getElementById('register-password').addEventListener('input', checkPasswordStrength);
+            
+            // Password confirmation validation
+            document.getElementById('register-confirm-password').addEventListener('input', validatePasswordConfirmation);
+        });
+
+        function showTab(tabName) {
+            // Hide all forms
+            document.getElementById('login-form').style.display = 'none';
+            document.getElementById('register-form').style.display = 'none';
+            
+            // Remove active class from all tabs
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            
+            // Show selected form and activate tab
+            document.getElementById(`${tabName}-form`).style.display = 'block';
+            event.target.classList.add('active');
+        }
+
+async function handleLogin(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(e.target);
+    const email = formData.get('email');
+    const password = formData.get('password');
+    
+    // Log exact request being sent
+    const requestData = { email, password };
+
+    
+    try {
+        // Identical to the working console test
+        const response = await fetch('http://localhost:8000/api/users/api-token-auth/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(requestData)
+        });
+        
+        // Get raw response first
+        const responseText = await response.text();
+        
+        // Parse response
+        let responseData;
+        try {
+            responseData = JSON.parse(responseText);
+        } catch (parseError) {
+            console.error('JSON parse error:', parseError);
+            alert('Invalid server response');
+            return;
+        }
+        
+        if (response.ok && responseData.token) {            
+            // Create user object from Django response
+            const userObj = {
+                id: responseData.user_id,
+                email: responseData.email,
+                username: responseData.username || responseData.email,
+                first_name: responseData.first_name || '',
+                last_name: responseData.last_name || ''
+            };
+                    
+            // Save to localStorage
+            try {
+                localStorage.setItem('authToken', responseData.token);
+                localStorage.setItem('authUser', JSON.stringify(userObj));
+                
+                // Update auth state if function exists
+                if (typeof loadAuthFromStorage === 'function') {
+                    loadAuthFromStorage();
+                }
+                
+                alert('Login successful!');
+                
+                // Redirect
+                const urlParams = new URLSearchParams(window.location.search);
+                const redirect = urlParams.get('redirect') || 'index.html';
+                window.location.href = redirect;
+                
+            } catch (storageError) {
+                console.error('localStorage save error:', storageError);
+                alert('Login successful but failed to save session');
+            }
+            
+        } else {
+
+            // Extract specific error messages
+            let errorMsg = 'Login failed';
+            
+            if (responseData.non_field_errors) {
+                errorMsg = responseData.non_field_errors.join(', ');
+            } else if (responseData.detail) {
+                errorMsg = responseData.detail;
+            } else if (responseData.email) {
+                errorMsg = 'Email: ' + responseData.email.join(', ');
+            } else if (responseData.password) {
+                errorMsg = 'Password: ' + responseData.password.join(', ');
+            }
+            
+            alert(errorMsg);
+        }
+        
+    } catch (error) {
+        console.error('Request failed:', error);
+        alert('Network error: ' + error.message);
+    }
+}
+        async function handleRegister(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            
+            // Validate password confirmation
+            const password = formData.get('password');
+            const confirmPassword = formData.get('confirm_password');
+            
+            if (password !== confirmPassword) {
+                alert('Passwords do not match');
+                return;
+            }
+            
+            const registerData = {
+                username: formData.get('username'),
+                email: formData.get('email'),
+                password: password,
+                first_name: formData.get('first_name'),
+                last_name: formData.get('last_name'),
+                phone: formData.get('phone') || null
+            };
+            
+            try {
+                const response = await apiCall('/api/users/users/', {
+                    method: 'POST',
+                    body: JSON.stringify(registerData)
+                });
+                
+                alert('Registration successful! Please login with your credentials.');
+                showTab('login');
+                
+                // Pre-fill login form
+                document.getElementById('login-email').value = registerData.email;
+                
+            } catch (error) {
+                console.error('Registration error:', error);
+                if (error.message.includes('400')) {
+                    alert('Registration failed. Please check your information and try again.');
+                } else {
+                    alert('Registration failed. Please try again later.');
+                }
+            }
+        }
+
+        function checkPasswordStrength() {
+            const password = document.getElementById('register-password').value;
+            const strengthBar = document.querySelector('.strength-fill');
+            const strengthText = document.querySelector('.strength-text');
+            
+            let strength = 0;
+            let strengthLabel = 'Weak';
+            
+            // Check password criteria
+            if (password.length >= 8) strength += 1;
+            if (/[a-z]/.test(password)) strength += 1;
+            if (/[A-Z]/.test(password)) strength += 1;
+            if (/[0-9]/.test(password)) strength += 1;
+            if (/[^A-Za-z0-9]/.test(password)) strength += 1;
+            
+            // Update strength indicator
+            const percentage = (strength / 5) * 100;
+            strengthBar.style.width = `${percentage}%`;
+            
+            if (strength <= 2) {
+                strengthBar.style.backgroundColor = '#ff4757';
+                strengthLabel = 'Weak';
+            } else if (strength <= 3) {
+                strengthBar.style.backgroundColor = '#ffa502';
+                strengthLabel = 'Fair';
+            } else if (strength <= 4) {
+                strengthBar.style.backgroundColor = '#2ed573';
+                strengthLabel = 'Good';
+            } else {
+                strengthBar.style.backgroundColor = '#1e90ff';
+                strengthLabel = 'Strong';
+            }
+            
+            strengthText.textContent = strengthLabel;
+        }
+
+        function validatePasswordConfirmation() {
+            const password = document.getElementById('register-password').value;
+            const confirmPassword = document.getElementById('register-confirm-password').value;
+            const confirmInput = document.getElementById('register-confirm-password');
+            
+            if (confirmPassword && password !== confirmPassword) {
+                confirmInput.setCustomValidity('Passwords do not match');
+                confirmInput.style.borderColor = '#ff4757';
+            } else {
+                confirmInput.setCustomValidity('');
+                confirmInput.style.borderColor = '';
+            }
+        }
+
+        async function syncCartWithServer() {
+            const localCart = getLocalCart();
+            if (localCart.length === 0) return;
+            
+            try {
+                // Get or create user's cart
+                let cart = await apiCall('/api/orders/carts/');
+                if (!cart.results || cart.results.length === 0) {
+                    cart = await apiCall('/api/orders/carts/', {
+                        method: 'POST',
+                        body: JSON.stringify({})
+                    });
+                } else {
+                    cart = cart.results[0];
+                }
+                
+                // Add local cart items to server cart
+                for (const item of localCart) {
+                    await apiCall('/api/orders/cart-items/', {
+                        method: 'POST',
+                        body: JSON.stringify({
+                            cart: cart.id,
+                            product: item.id,
+                            quantity: item.quantity
+                        })
+                    });
+                }
+                
+                // Clear local cart
+                localStorage.removeItem('cart');
+                
+            } catch (error) {
+                console.error('Error syncing cart:', error);
+            }
+        }
+
+        // Social login handlers (placeholder)
+        document.querySelector('.btn-social.google').addEventListener('click', function() {
+            alert('Google login integration would be implemented here');
+        });
+
+        document.querySelector('.btn-social.facebook').addEventListener('click', function() {
+            alert('Facebook login integration would be implemented here');
+        });
+
+        // Forgot password handler (placeholder)
+        document.querySelector('.forgot-password').addEventListener('click', function(e) {
+            e.preventDefault();
+            alert('Password reset functionality would be implemented here');
+        });
+    </script>
+</body>
+</html>
+

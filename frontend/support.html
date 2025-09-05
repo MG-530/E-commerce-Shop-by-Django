@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Support - E-Commerce Store</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="nav-brand">
+                <h1><a href="index.html">ShopHub</a></h1>
+            </div>
+            <nav class="nav-menu">
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="cart.html">Cart (<span id="cart-count">0</span>)</a></li>
+                    <li><a href="orders.html">Orders</a></li>
+                    <li><a href="support.html" class="active">Support</a></li>
+                    <li id="auth-menu">
+                        <a href="login.html" id="login-link">Login</a>
+                        <a href="#" id="logout-link" style="display: none;">Logout</a>
+                    </li>
+                </ul>
+            </nav>
+            <div class="mobile-menu-toggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </header>
+
+    <main class="main">
+        <div class="container">
+            <h1 class="page-title">Customer Support</h1>
+            
+            <div class="support-tabs">
+                <button class="tab-btn active" onclick="showTab('help')">Help Center</button>
+                <button class="tab-btn" onclick="showTab('contact')">Contact Us</button>
+                <button class="tab-btn auth-required" onclick="showTab('tickets')" style="display: none;">My Tickets</button>
+                <button class="tab-btn auth-required" onclick="showTab('returns')" style="display: none;">Returns</button>
+            </div>
+
+            <!-- Help Center Tab -->
+            <div class="support-content" id="help-content">
+                <div class="help-center">
+                    <div class="search-help">
+                        <input type="text" id="help-search" placeholder="Search for help topics...">
+                        <button onclick="searchHelp()">Search</button>
+                    </div>
+                    
+                    <div class="help-categories">
+                        <div class="help-category">
+                            <h3>Ordering & Payment</h3>
+                            <ul>
+                                <li><a href="#" onclick="showHelpArticle('how-to-order')">How to place an order</a></li>
+                                <li><a href="#" onclick="showHelpArticle('payment-methods')">Accepted payment methods</a></li>
+                                <li><a href="#" onclick="showHelpArticle('order-changes')">Modifying or canceling orders</a></li>
+                                <li><a href="#" onclick="showHelpArticle('payment-issues')">Payment problems</a></li>
+                            </ul>
+                        </div>
+                        
+                        <div class="help-category">
+                            <h3>Shipping & Delivery</h3>
+                            <ul>
+                                <li><a href="#" onclick="showHelpArticle('shipping-options')">Shipping options and costs</a></li>
+                                <li><a href="#" onclick="showHelpArticle('delivery-times')">Delivery timeframes</a></li>
+                                <li><a href="#" onclick="showHelpArticle('tracking')">Tracking your order</a></li>
+                                <li><a href="#" onclick="showHelpArticle('delivery-issues')">Delivery problems</a></li>
+                            </ul>
+                        </div>
+                        
+                        <div class="help-category">
+                            <h3>Returns & Refunds</h3>
+                            <ul>
+                                <li><a href="#" onclick="showHelpArticle('return-policy')">Return policy</a></li>
+                                <li><a href="#" onclick="showHelpArticle('how-to-return')">How to return items</a></li>
+                                <li><a href="#" onclick="showHelpArticle('refund-process')">Refund process</a></li>
+                                <li><a href="#" onclick="showHelpArticle('exchanges')">Exchanges</a></li>
+                            </ul>
+                        </div>
+                        
+                        <div class="help-category">
+                            <h3>Account & Profile</h3>
+                            <ul>
+                                <li><a href="#" onclick="showHelpArticle('create-account')">Creating an account</a></li>
+                                <li><a href="#" onclick="showHelpArticle('forgot-password')">Forgot password</a></li>
+                                <li><a href="#" onclick="showHelpArticle('update-profile')">Updating profile information</a></li>
+                                <li><a href="#" onclick="showHelpArticle('privacy')">Privacy and security</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contact Us Tab -->
+            <div class="support-content" id="contact-content" style="display: none;">
+                <div class="contact-options">
+                    <div class="contact-method">
+                        <h3>📞 Phone Support</h3>
+                        <p>Call us for immediate assistance</p>
+                        <p><strong>1-800-SHOPHUB (1-800-746-7482)</strong></p>
+                        <p>Monday - Friday: 9 AM - 8 PM EST<br>
+                           Saturday - Sunday: 10 AM - 6 PM EST</p>
+                    </div>
+                    
+                    <div class="contact-method">
+                        <h3>💬 Live Chat</h3>
+                        <p>Chat with our support team</p>
+                        <button class="btn-chat" onclick="startLiveChat()">Start Chat</button>
+                        <p>Available 24/7</p>
+                    </div>
+                    
+                    <div class="contact-method">
+                        <h3>📧 Email Support</h3>
+                        <p>Send us a detailed message</p>
+                        <p><strong>support@shophub.com</strong></p>
+                        <p>We typically respond within 24 hours</p>
+                    </div>
+                </div>
+                
+                <div class="contact-form-section">
+                    <h3>Send us a Message</h3>
+                    <form id="contact-form">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="contact-name">Name</label>
+                                <input type="text" id="contact-name" name="name" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="contact-email">Email</label>
+                                <input type="email" id="contact-email" name="email" required>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="contact-subject">Subject</label>
+                            <select id="contact-subject" name="subject" required>
+                                <option value="">Select a topic</option>
+                                <option value="order-inquiry">Order Inquiry</option>
+                                <option value="payment-issue">Payment Issue</option>
+                                <option value="shipping-problem">Shipping Problem</option>
+                                <option value="return-request">Return Request</option>
+                                <option value="product-question">Product Question</option>
+                                <option value="technical-issue">Technical Issue</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="order-number">Order Number (if applicable)</label>
+                            <input type="text" id="order-number" name="order_number" placeholder="e.g., #12345">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="contact-message">Message</label>
+                            <textarea id="contact-message" name="message" rows="6" required 
+                                      placeholder="Please describe your issue or question in detail..."></textarea>
+                        </div>
+                        
+                        <button type="submit" class="btn-submit">Send Message</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- My Tickets Tab -->
+            <div class="support-content auth-required" id="tickets-content" style="display: none;">
+                <div class="tickets-header">
+                    <h3>My Support Tickets</h3>
+                    <button class="btn-new-ticket" onclick="showTab('contact')">Create New Ticket</button>
+                </div>
+                
+                <div class="tickets-list" id="tickets-list">
+                    <div class="loading" id="tickets-loading">Loading tickets...</div>
+                    <!-- Tickets will be loaded here -->
+                </div>
+                
+                <div class="empty-tickets" id="empty-tickets" style="display: none;">
+                    <h3>No Support Tickets</h3>
+                    <p>You haven't created any support tickets yet.</p>
+                    <button class="btn-new-ticket" onclick="showTab('contact')">Create Your First Ticket</button>
+                </div>
+            </div>
+
+            <!-- Returns Tab -->
+            <div class="support-content auth-required" id="returns-content" style="display: none;">
+                <div class="returns-header">
+                    <h3>Returns & Exchanges</h3>
+                    <p>Manage your return requests and track their status</p>
+                </div>
+                
+                <div class="return-form-section">
+                    <h4>Request a Return</h4>
+                    <form id="return-form">
+                        <div class="form-group">
+                            <label for="return-order">Order Number</label>
+                            <select id="return-order" name="order_id" required>
+                                <option value="">Select an order</option>
+                                <!-- Orders will be loaded here -->
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="return-reason">Reason for Return</label>
+                            <select id="return-reason" name="reason" required>
+                                <option value="">Select a reason</option>
+                                <option value="defective">Defective/Damaged</option>
+                                <option value="wrong-item">Wrong Item Received</option>
+                                <option value="not-as-described">Not as Described</option>
+                                <option value="size-issue">Size/Fit Issue</option>
+                                <option value="changed-mind">Changed Mind</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="return-description">Description</label>
+                            <textarea id="return-description" name="description" rows="4" required
+                                      placeholder="Please provide details about the issue..."></textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="return-type">Return Type</label>
+                            <select id="return-type" name="return_type" required>
+                                <option value="refund">Refund</option>
+                                <option value="exchange">Exchange</option>
+                                <option value="store-credit">Store Credit</option>
+                            </select>
+                        </div>
+                        
+                        <button type="submit" class="btn-submit">Submit Return Request</button>
+                    </form>
+                </div>
+                
+                <div class="returns-list">
+                    <h4>My Return Requests</h4>
+                    <div class="loading" id="returns-loading">Loading returns...</div>
+                    <div id="returns-list-content">
+                        <!-- Returns will be loaded here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2024 ShopHub. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Help Article Modal -->
+    <div class="modal" id="help-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="help-article-title">Help Article</h2>
+                <span class="close" onclick="closeHelpModal()">&times;</span>
+            </div>
+            <div class="modal-body" id="help-article-content">
+                <!-- Help article content will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/cart.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            initAuth();
+            updateCartCount();
+            
+            // Mobile menu toggle
+            document.querySelector('.mobile-menu-toggle').addEventListener('click', function() {
+                document.querySelector('.nav-menu').classList.toggle('active');
+            });
+
+            // Form submissions
+            document.getElementById('contact-form').addEventListener('submit', handleContactForm);
+            document.getElementById('return-form').addEventListener('submit', handleReturnForm);
+            
+            // Load data if authenticated
+            if (isAuthenticated()) {
+                loadTickets();
+                loadReturns();
+                loadOrdersForReturn();
+            }
+            
+            // Check for return parameter in URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const returnOrderId = urlParams.get('return');
+            if (returnOrderId && isAuthenticated()) {
+                showTab('returns');
+                document.getElementById('return-order').value = returnOrderId;
+            }
+        });
+
+        function showTab(tabName) {
+            // Hide all content
+            document.querySelectorAll('.support-content').forEach(content => {
+                content.style.display = 'none';
+            });
+            
+            // Remove active class from all tabs
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Show selected content and activate tab
+            document.getElementById(`${tabName}-content`).style.display = 'block';
+            event.target.classList.add('active');
+        }
+
+        async function handleContactForm(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const ticketData = {
+                subject: formData.get('subject'),
+                message: formData.get('message'),
+                name: formData.get('name'),
+                email: formData.get('email'),
+                order_number: formData.get('order_number') || null
+            };
+            
+            try {
+                await SupportAPI.createTicket(ticketData);
+                alert('Your message has been sent successfully! We will respond within 24 hours.');
+                e.target.reset();
+                
+                if (isAuthenticated()) {
+                    loadTickets();
+                }
+            } catch (error) {
+                console.error('Error sending message:', error);
+                alert('Error sending message. Please try again.');
+            }
+        }
+
+        async function handleReturnForm(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const returnData = {
+                order_id: formData.get('order_id'),
+                reason: formData.get('reason'),
+                description: formData.get('description'),
+                return_type: formData.get('return_type')
+            };
+            
+            try {
+                await ReturnsAPI.createReturn(returnData);
+                alert('Return request submitted successfully! We will process it within 2-3 business days.');
+                e.target.reset();
+                loadReturns();
+            } catch (error) {
+                console.error('Error submitting return:', error);
+                alert('Error submitting return request. Please try again.');
+            }
+        }
+
+        async function loadTickets() {
+            try {
+                document.getElementById('tickets-loading').style.display = 'block';
+                
+                const response = await SupportAPI.getTickets();
+                const tickets = response.results || [];
+                
+                if (tickets.length === 0) {
+                    document.getElementById('empty-tickets').style.display = 'block';
+                    document.getElementById('tickets-list').innerHTML = '';
+                } else {
+                    displayTickets(tickets);
+                    document.getElementById('empty-tickets').style.display = 'none';
+                }
+                
+                document.getElementById('tickets-loading').style.display = 'none';
+            } catch (error) {
+                console.error('Error loading tickets:', error);
+                document.getElementById('tickets-loading').textContent = 'Error loading tickets';
+            }
+        }
+
+        function displayTickets(tickets) {
+            const ticketsList = document.getElementById('tickets-list');
+            
+            ticketsList.innerHTML = tickets.map(ticket => `
+                <div class="ticket-card">
+                    <div class="ticket-header">
+                        <h4>Ticket #${ticket.id}</h4>
+                        <span class="status-badge status-${ticket.status}">${ticket.status.toUpperCase()}</span>
+                    </div>
+                    <div class="ticket-info">
+                        <p><strong>Subject:</strong> ${ticket.subject}</p>
+                        <p><strong>Created:</strong> ${formatDate(ticket.created_at)}</p>
+                        <p><strong>Last Updated:</strong> ${formatDate(ticket.updated_at)}</p>
+                    </div>
+                    <div class="ticket-preview">
+                        <p>${ticket.message.substring(0, 150)}${ticket.message.length > 150 ? '...' : ''}</p>
+                    </div>
+                    <div class="ticket-actions">
+                        <button class="btn-view-ticket" onclick="viewTicket(${ticket.id})">View Details</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function loadReturns() {
+            try {
+                document.getElementById('returns-loading').style.display = 'block';
+                
+                const response = await ReturnsAPI.getReturns();
+                const returns = response.results || [];
+                
+                displayReturns(returns);
+                document.getElementById('returns-loading').style.display = 'none';
+            } catch (error) {
+                console.error('Error loading returns:', error);
+                document.getElementById('returns-loading').textContent = 'Error loading returns';
+            }
+        }
+
+        function displayReturns(returns) {
+            const returnsList = document.getElementById('returns-list-content');
+            
+            if (returns.length === 0) {
+                returnsList.innerHTML = '<p>No return requests found.</p>';
+                return;
+            }
+            
+            returnsList.innerHTML = returns.map(returnItem => `
+                <div class="return-card">
+                    <div class="return-header">
+                        <h5>Return #${returnItem.id}</h5>
+                        <span class="status-badge status-${returnItem.status}">${returnItem.status.toUpperCase()}</span>
+                    </div>
+                    <div class="return-info">
+                        <p><strong>Order:</strong> #${returnItem.order_id}</p>
+                        <p><strong>Reason:</strong> ${returnItem.reason}</p>
+                        <p><strong>Type:</strong> ${returnItem.return_type}</p>
+                        <p><strong>Requested:</strong> ${formatDate(returnItem.created_at)}</p>
+                    </div>
+                    <div class="return-description">
+                        <p>${returnItem.description}</p>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function loadOrdersForReturn() {
+            try {
+                const response = await OrdersAPI.getOrders();
+                const orders = response.results || [];
+                
+                // Filter delivered orders from last 30 days
+                const eligibleOrders = orders.filter(order => {
+                    const orderDate = new Date(order.created_at);
+                    const thirtyDaysAgo = new Date();
+                    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+                    
+                    return order.status === 'delivered' && orderDate >= thirtyDaysAgo;
+                });
+                
+                const orderSelect = document.getElementById('return-order');
+                orderSelect.innerHTML = '<option value="">Select an order</option>';
+                
+                eligibleOrders.forEach(order => {
+                    const option = document.createElement('option');
+                    option.value = order.id;
+                    option.textContent = `Order #${order.id} - ${formatDate(order.created_at)} - $${order.total_amount}`;
+                    orderSelect.appendChild(option);
+                });
+            } catch (error) {
+                console.error('Error loading orders for return:', error);
+            }
+        }
+
+        function searchHelp() {
+            const query = document.getElementById('help-search').value.toLowerCase();
+            const categories = document.querySelectorAll('.help-category');
+            
+            categories.forEach(category => {
+                const links = category.querySelectorAll('a');
+                let hasVisibleLinks = false;
+                
+                links.forEach(link => {
+                    const text = link.textContent.toLowerCase();
+                    if (text.includes(query) || query === '') {
+                        link.parentElement.style.display = 'block';
+                        hasVisibleLinks = true;
+                    } else {
+                        link.parentElement.style.display = 'none';
+                    }
+                });
+                
+                category.style.display = hasVisibleLinks ? 'block' : 'none';
+            });
+        }
+
+        function showHelpArticle(articleId) {
+            const articles = {
+                'how-to-order': {
+                    title: 'How to Place an Order',
+                    content: `
+                        <h3>Placing Your First Order</h3>
+                        <p>Follow these simple steps to place an order:</p>
+                        <ol>
+                            <li>Browse our products and click on items you're interested in</li>
+                            <li>On the product page, select your desired quantity and click "Add to Cart"</li>
+                            <li>Continue shopping or click the cart icon to review your items</li>
+                            <li>In your cart, review items and quantities, then click "Proceed to Checkout"</li>
+                            <li>Enter your shipping address and payment information</li>
+                            <li>Review your order and click "Place Order" to complete your purchase</li>
+                        </ol>
+                        <p>You'll receive an email confirmation with your order details and tracking information.</p>
+                    `
+                },
+                'payment-methods': {
+                    title: 'Accepted Payment Methods',
+                    content: `
+                        <h3>We Accept the Following Payment Methods:</h3>
+                        <ul>
+                            <li><strong>Credit Cards:</strong> Visa, MasterCard, American Express, Discover</li>
+                            <li><strong>Debit Cards:</strong> All major debit cards with Visa or MasterCard logos</li>
+                            <li><strong>PayPal:</strong> Pay securely with your PayPal account</li>
+                            <li><strong>Apple Pay:</strong> Available on supported devices</li>
+                            <li><strong>Google Pay:</strong> Available on supported devices</li>
+                        </ul>
+                        <p>All payments are processed securely using industry-standard encryption.</p>
+                    `
+                },
+                'return-policy': {
+                    title: 'Return Policy',
+                    content: `
+                        <h3>Our Return Policy</h3>
+                        <p>We want you to be completely satisfied with your purchase. Here's our return policy:</p>
+                        <ul>
+                            <li><strong>Return Window:</strong> 30 days from delivery date</li>
+                            <li><strong>Condition:</strong> Items must be unused and in original packaging</li>
+                            <li><strong>Refund Method:</strong> Refunds processed to original payment method</li>
+                            <li><strong>Return Shipping:</strong> Free return shipping for defective items</li>
+                        </ul>
+                        <h4>Items That Cannot Be Returned:</h4>
+                        <ul>
+                            <li>Personalized or customized items</li>
+                            <li>Perishable goods</li>
+                            <li>Digital downloads</li>
+                            <li>Items marked as final sale</li>
+                        </ul>
+                    `
+                }
+            };
+            
+            const article = articles[articleId];
+            if (article) {
+                document.getElementById('help-article-title').textContent = article.title;
+                document.getElementById('help-article-content').innerHTML = article.content;
+                document.getElementById('help-modal').style.display = 'block';
+            }
+        }
+
+        function closeHelpModal() {
+            document.getElementById('help-modal').style.display = 'none';
+        }
+
+        function startLiveChat() {
+            alert('Live chat would be integrated here with a service like Intercom, Zendesk Chat, or similar.');
+        }
+
+        async function viewTicket(ticketId) {
+            try {
+                const ticket = await SupportAPI.getTicket(ticketId);
+                // This would open a detailed ticket view
+                alert(`Viewing ticket #${ticketId}\n\nSubject: ${ticket.subject}\nStatus: ${ticket.status}\n\nThis would open a detailed ticket interface.`);
+            } catch (error) {
+                console.error('Error loading ticket:', error);
+                alert('Error loading ticket details');
+            }
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('help-modal');
+            if (event.target === modal) {
+                closeHelpModal();
+            }
+        }
+    </script>
+
+    <style>
+        .support-tabs {
+            display: flex;
+            background: var(--light-gray);
+            border-radius: var(--border-radius);
+            padding: 0.25rem;
+            margin-bottom: 2rem;
+            overflow-x: auto;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 1rem;
+            background: none;
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-weight: 500;
+            transition: var(--transition);
+            white-space: nowrap;
+        }
+
+        .tab-btn.active {
+            background: var(--white);
+            color: var(--primary-color);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .support-content {
+            background: var(--white);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-sm);
+            padding: 2rem;
+        }
+
+        .search-help {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .search-help input {
+            flex: 1;
+            padding: 0.75rem;
+            border: 2px solid var(--medium-gray);
+            border-radius: var(--border-radius);
+        }
+
+        .search-help button {
+            padding: 0.75rem 1.5rem;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+        }
+
+        .help-categories {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .help-category {
+            background: var(--light-gray);
+            padding: 1.5rem;
+            border-radius: var(--border-radius);
+        }
+
+        .help-category h3 {
+            margin-bottom: 1rem;
+            color: var(--primary-color);
+        }
+
+        .help-category ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .help-category li {
+            margin-bottom: 0.5rem;
+        }
+
+        .help-category a {
+            color: var(--text-primary);
+            text-decoration: none;
+            padding: 0.5rem;
+            display: block;
+            border-radius: var(--border-radius);
+            transition: var(--transition);
+        }
+
+        .help-category a:hover {
+            background: var(--white);
+            color: var(--primary-color);
+        }
+
+        .contact-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .contact-method {
+            text-align: center;
+            padding: 2rem;
+            background: var(--light-gray);
+            border-radius: var(--border-radius);
+        }
+
+        .contact-method h3 {
+            margin-bottom: 1rem;
+            color: var(--primary-color);
+        }
+
+        .btn-chat {
+            background: var(--success-color);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-weight: 500;
+            margin: 1rem 0;
+        }
+
+        .contact-form-section {
+            background: var(--light-gray);
+            padding: 2rem;
+            border-radius: var(--border-radius);
+        }
+
+        .tickets-header,
+        .returns-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--medium-gray);
+        }
+
+        .btn-new-ticket {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .ticket-card,
+        .return-card {
+            background: var(--light-gray);
+            padding: 1.5rem;
+            border-radius: var(--border-radius);
+            margin-bottom: 1rem;
+        }
+
+        .ticket-header,
+        .return-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .ticket-info,
+        .return-info {
+            margin-bottom: 1rem;
+        }
+
+        .ticket-info p,
+        .return-info p {
+            margin-bottom: 0.25rem;
+        }
+
+        .ticket-preview,
+        .return-description {
+            color: var(--text-secondary);
+            font-style: italic;
+            margin-bottom: 1rem;
+        }
+
+        .btn-view-ticket {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+        }
+
+        .return-form-section {
+            background: var(--light-gray);
+            padding: 2rem;
+            border-radius: var(--border-radius);
+            margin-bottom: 2rem;
+        }
+
+        .empty-tickets {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-secondary);
+        }
+
+        @media (max-width: 768px) {
+            .support-tabs {
+                flex-direction: column;
+            }
+
+            .tab-btn {
+                text-align: left;
+            }
+
+            .contact-options {
+                grid-template-columns: 1fr;
+            }
+
+            .tickets-header,
+            .returns-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+
+            .help-categories {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</body>
+</html>
+

@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Orders - E-Commerce Store</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="nav-brand">
+                <h1><a href="index.html">ShopHub</a></h1>
+            </div>
+            <nav class="nav-menu">
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="cart.html">Cart (<span id="cart-count">0</span>)</a></li>
+                    <li><a href="orders.html" class="active">Orders</a></li>
+                    <li><a href="support.html">Support</a></li>
+                    <li id="auth-menu">
+                        <a href="login.html" id="login-link">Login</a>
+                        <a href="#" id="logout-link" style="display: none;">Logout</a>
+                    </li>
+                </ul>
+            </nav>
+            <div class="mobile-menu-toggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </header>
+
+    <main class="main">
+        <div class="container">
+            <h1 class="page-title">My Orders</h1>
+            
+            <div class="auth-required" style="display: none;">
+                <div class="orders-filters">
+                    <div class="filter-group">
+                        <label for="status-filter">Filter by Status:</label>
+                        <select id="status-filter">
+                            <option value="">All Orders</option>
+                            <option value="pending">Pending</option>
+                            <option value="processing">Processing</option>
+                            <option value="shipped">Shipped</option>
+                            <option value="delivered">Delivered</option>
+                            <option value="cancelled">Cancelled</option>
+                        </select>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label for="date-filter">Filter by Date:</label>
+                        <select id="date-filter">
+                            <option value="">All Time</option>
+                            <option value="30">Last 30 Days</option>
+                            <option value="90">Last 3 Months</option>
+                            <option value="365">Last Year</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="orders-container">
+                    <div class="loading" id="loading">Loading orders...</div>
+                    <div class="orders-list" id="orders-list">
+                        <!-- Orders will be loaded here -->
+                    </div>
+                    
+                    <div class="empty-orders" id="empty-orders" style="display: none;">
+                        <div class="empty-content">
+                            <h2>No orders found</h2>
+                            <p>You haven't placed any orders yet.</p>
+                            <a href="index.html" class="btn-start-shopping">Start Shopping</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="guest-only">
+                <div class="auth-required-message">
+                    <h2>Please Login to View Orders</h2>
+                    <p>You need to be logged in to view your order history.</p>
+                    <a href="login.html" class="btn-auth">Login</a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2024 ShopHub. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Order Details Modal -->
+    <div class="modal" id="order-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Order Details</h2>
+                <span class="close" onclick="closeOrderModal()">&times;</span>
+            </div>
+            <div class="modal-body" id="order-details">
+                <!-- Order details will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/cart.js"></script>
+    <script>
+        let currentOrders = [];
+
+        document.addEventListener('DOMContentLoaded', function() {
+            initAuth();
+            updateCartCount();
+            
+            if (isAuthenticated()) {
+                loadOrders();
+            }
+            
+            // Mobile menu toggle
+            document.querySelector('.mobile-menu-toggle').addEventListener('click', function() {
+                document.querySelector('.nav-menu').classList.toggle('active');
+            });
+
+            // Filter event listeners
+            document.getElementById('status-filter').addEventListener('change', filterOrders);
+            document.getElementById('date-filter').addEventListener('change', filterOrders);
+            
+            // Check for specific order in URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const orderId = urlParams.get('order');
+            if (orderId && isAuthenticated()) {
+                setTimeout(() => viewOrderDetails(orderId), 1000);
+            }
+        });
+
+        async function loadOrders() {
+            try {
+                document.getElementById('loading').style.display = 'block';
+                
+                const response = await OrdersAPI.getOrders();
+                currentOrders = response.results || [];
+                
+                if (currentOrders.length === 0) {
+                    showEmptyOrders();
+                } else {
+                    displayOrders(currentOrders);
+                }
+                
+                document.getElementById('loading').style.display = 'none';
+            } catch (error) {
+                console.error('Error loading orders:', error);
+                document.getElementById('loading').textContent = 'Error loading orders';
+            }
+        }
+
+        function displayOrders(orders) {
+            const ordersList = document.getElementById('orders-list');
+            document.getElementById('empty-orders').style.display = 'none';
+            
+            ordersList.innerHTML = orders.map(order => `
+                <div class="order-card" data-order-id="${order.id}">
+                    <div class="order-header">
+                        <div class="order-info">
+                            <h3>Order #${order.id}</h3>
+                            <p class="order-date">Placed on ${formatDate(order.created_at)}</p>
+                        </div>
+                        <div class="order-status">
+                            <span class="status-badge status-${order.status}">${order.status.toUpperCase()}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="order-summary">
+                        <div class="order-items">
+                            <p><strong>Items:</strong> ${order.total_items || 'N/A'}</p>
+                            <p><strong>Total:</strong> $${order.total_amount || '0.00'}</p>
+                        </div>
+                        
+                        <div class="order-actions">
+                            <button class="btn-view-order" onclick="viewOrderDetails(${order.id})">
+                                View Details
+                            </button>
+                            ${order.status === 'delivered' ? 
+                                `<button class="btn-reorder" onclick="reorder(${order.id})">Reorder</button>` : ''}
+                            ${order.status === 'pending' || order.status === 'processing' ? 
+                                `<button class="btn-cancel-order" onclick="cancelOrder(${order.id})">Cancel</button>` : ''}
+                            ${order.status === 'delivered' ? 
+                                `<button class="btn-return" onclick="initiateReturn(${order.id})">Return</button>` : ''}
+                        </div>
+                    </div>
+                    
+                    ${order.tracking_number ? `
+                        <div class="order-tracking">
+                            <p><strong>Tracking:</strong> ${order.tracking_number}</p>
+                            <button class="btn-track" onclick="trackOrder('${order.tracking_number}')">
+                                Track Package
+                            </button>
+                        </div>
+                    ` : ''}
+                </div>
+            `).join('');
+        }
+
+        function showEmptyOrders() {
+            document.getElementById('orders-list').innerHTML = '';
+            document.getElementById('empty-orders').style.display = 'block';
+        }
+
+        function filterOrders() {
+            const statusFilter = document.getElementById('status-filter').value;
+            const dateFilter = document.getElementById('date-filter').value;
+            
+            let filteredOrders = [...currentOrders];
+            
+            // Filter by status
+            if (statusFilter) {
+                filteredOrders = filteredOrders.filter(order => order.status === statusFilter);
+            }
+            
+            // Filter by date
+            if (dateFilter) {
+                const daysAgo = parseInt(dateFilter);
+                const cutoffDate = new Date();
+                cutoffDate.setDate(cutoffDate.getDate() - daysAgo);
+                
+                filteredOrders = filteredOrders.filter(order => 
+                    new Date(order.created_at) >= cutoffDate
+                );
+            }
+            
+            if (filteredOrders.length === 0) {
+                showEmptyOrders();
+            } else {
+                displayOrders(filteredOrders);
+            }
+        }
+
+        async function viewOrderDetails(orderId) {
+            try {
+                const order = await OrdersAPI.getOrder(orderId);
+                const orderItems = await OrdersAPI.getOrderItems(orderId);
+                
+                displayOrderDetails(order, orderItems.results || []);
+                document.getElementById('order-modal').style.display = 'block';
+            } catch (error) {
+                console.error('Error loading order details:', error);
+                alert('Error loading order details');
+            }
+        }
+
+        function displayOrderDetails(order, items) {
+            const orderDetails = document.getElementById('order-details');
+            
+            orderDetails.innerHTML = `
+                <div class="order-detail-header">
+                    <h3>Order #${order.id}</h3>
+                    <span class="status-badge status-${order.status}">${order.status.toUpperCase()}</span>
+                </div>
+                
+                <div class="order-detail-info">
+                    <div class="info-section">
+                        <h4>Order Information</h4>
+                        <p><strong>Order Date:</strong> ${formatDate(order.created_at)}</p>
+                        <p><strong>Status:</strong> ${order.status}</p>
+                        ${order.tracking_number ? `<p><strong>Tracking Number:</strong> ${order.tracking_number}</p>` : ''}
+                        ${order.estimated_delivery ? `<p><strong>Estimated Delivery:</strong> ${formatDate(order.estimated_delivery)}</p>` : ''}
+                    </div>
+                    
+                    <div class="info-section">
+                        <h4>Shipping Address</h4>
+                        <div class="address">
+                            ${order.shipping_address ? `
+                                <p>${order.shipping_address.full_name}</p>
+                                <p>${order.shipping_address.address}</p>
+                                <p>${order.shipping_address.city}, ${order.shipping_address.state} ${order.shipping_address.zip_code}</p>
+                            ` : '<p>No shipping address available</p>'}
+                        </div>
+                    </div>
+                    
+                    <div class="info-section">
+                        <h4>Payment Information</h4>
+                        <p><strong>Payment Method:</strong> ${order.payment_method || 'N/A'}</p>
+                        <p><strong>Payment Status:</strong> ${order.payment_status || 'N/A'}</p>
+                    </div>
+                </div>
+                
+                <div class="order-items-detail">
+                    <h4>Order Items</h4>
+                    <div class="items-list">
+                        ${items.map(item => `
+                            <div class="order-item">
+                                <div class="item-image">
+                                    <img src="${item.product_image || 'images/placeholder.jpg'}" alt="${item.product_name}">
+                                </div>
+                                <div class="item-details">
+                                    <h5>${item.product_name}</h5>
+                                    <p>SKU: ${item.product_sku || 'N/A'}</p>
+                                    <p>Quantity: ${item.quantity}</p>
+                                    <p>Price: $${item.price}</p>
+                                    <p><strong>Total: $${(item.price * item.quantity).toFixed(2)}</strong></p>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+                
+                <div class="order-total-detail">
+                    <div class="total-breakdown">
+                        <div class="total-row">
+                            <span>Subtotal:</span>
+                            <span>$${order.subtotal || '0.00'}</span>
+                        </div>
+                        <div class="total-row">
+                            <span>Shipping:</span>
+                            <span>$${order.shipping_cost || '0.00'}</span>
+                        </div>
+                        <div class="total-row">
+                            <span>Tax:</span>
+                            <span>$${order.tax_amount || '0.00'}</span>
+                        </div>
+                        <div class="total-row total">
+                            <span><strong>Total:</strong></span>
+                            <span><strong>$${order.total_amount || '0.00'}</strong></span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function closeOrderModal() {
+            document.getElementById('order-modal').style.display = 'none';
+        }
+
+        async function cancelOrder(orderId) {
+            if (!confirm('Are you sure you want to cancel this order?')) {
+                return;
+            }
+            
+            try {
+                await OrdersAPI.updateOrder(orderId, { status: 'cancelled' });
+                alert('Order cancelled successfully');
+                loadOrders();
+            } catch (error) {
+                console.error('Error cancelling order:', error);
+                alert('Error cancelling order');
+            }
+        }
+
+        async function reorder(orderId) {
+            try {
+                const orderItems = await OrdersAPI.getOrderItems(orderId);
+                
+                // Add all items to cart
+                for (const item of orderItems.results) {
+                    await addToCart(item.product, item.product_name, item.price, item.quantity);
+                }
+                
+                alert('Items added to cart successfully!');
+                window.location.href = 'cart.html';
+            } catch (error) {
+                console.error('Error reordering:', error);
+                alert('Error adding items to cart');
+            }
+        }
+
+        function trackOrder(trackingNumber) {
+            // This would integrate with shipping provider's tracking API
+            alert(`Tracking order with number: ${trackingNumber}\n\nThis would open the shipping provider's tracking page.`);
+        }
+
+        function initiateReturn(orderId) {
+            // Redirect to returns page with order ID
+            window.location.href = `support.html?return=${orderId}`;
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('order-modal');
+            if (event.target === modal) {
+                closeOrderModal();
+            }
+        }
+    </script>
+
+    <style>
+        .orders-filters {
+            background: var(--white);
+            padding: 1.5rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 2rem;
+            display: flex;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .filter-group label {
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .order-card {
+            background: var(--white);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-sm);
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            transition: var(--transition);
+        }
+
+        .order-card:hover {
+            box-shadow: var(--shadow-md);
+        }
+
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--medium-gray);
+        }
+
+        .order-info h3 {
+            margin-bottom: 0.25rem;
+            color: var(--primary-color);
+        }
+
+        .order-date {
+            color: var(--text-secondary);
+            margin: 0;
+        }
+
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-pending { background: var(--warning-color); color: white; }
+        .status-processing { background: var(--primary-color); color: white; }
+        .status-shipped { background: var(--accent-color); color: white; }
+        .status-delivered { background: var(--success-color); color: white; }
+        .status-cancelled { background: var(--danger-color); color: white; }
+
+        .order-summary {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .order-actions {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .order-actions button {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: var(--transition);
+        }
+
+        .btn-view-order {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-reorder {
+            background: var(--success-color);
+            color: white;
+        }
+
+        .btn-cancel-order {
+            background: var(--danger-color);
+            color: white;
+        }
+
+        .btn-return {
+            background: var(--warning-color);
+            color: white;
+        }
+
+        .btn-track {
+            background: var(--accent-color);
+            color: white;
+        }
+
+        .order-tracking {
+            padding-top: 1rem;
+            border-top: 1px solid var(--medium-gray);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .auth-required-message {
+            text-align: center;
+            padding: 4rem 2rem;
+            background: var(--white);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .order-detail-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--medium-gray);
+        }
+
+        .order-detail-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .info-section h4 {
+            margin-bottom: 1rem;
+            color: var(--primary-color);
+        }
+
+        .order-item {
+            display: flex;
+            gap: 1rem;
+            padding: 1rem;
+            border: 1px solid var(--medium-gray);
+            border-radius: var(--border-radius);
+            margin-bottom: 1rem;
+        }
+
+        .item-image img {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: var(--border-radius);
+        }
+
+        .total-breakdown {
+            max-width: 300px;
+            margin-left: auto;
+        }
+
+        .total-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }
+
+        .total-row.total {
+            padding-top: 0.5rem;
+            border-top: 1px solid var(--medium-gray);
+            font-size: 1.1rem;
+        }
+
+        @media (max-width: 768px) {
+            .orders-filters {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .order-summary {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+
+            .order-actions {
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            .order-tracking {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+
+            .order-detail-info {
+                grid-template-columns: 1fr;
+            }
+
+            .order-item {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+    </style>
+</body>
+</html>
+

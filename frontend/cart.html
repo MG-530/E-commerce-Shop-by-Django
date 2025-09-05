@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shopping Cart - E-Commerce Store</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="nav-brand">
+                <h1><a href="index.html">ShopHub</a></h1>
+            </div>
+            <nav class="nav-menu">
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="cart.html" class="active">Cart (<span id="cart-count">0</span>)</a></li>
+                    <li><a href="orders.html">Orders</a></li>
+                    <li><a href="support.html">Support</a></li>
+                    <li id="auth-menu">
+                        <a href="login.html" id="login-link">Login</a>
+                        <a href="#" id="logout-link" style="display: none;">Logout</a>
+                    </li>
+                </ul>
+            </nav>
+            <div class="mobile-menu-toggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </header>
+
+    <main class="main">
+        <div class="container">
+            <h1 class="page-title">Shopping Cart</h1>
+            
+            <div class="cart-container">
+                <div class="cart-items" id="cart-items">
+                    <div class="loading" id="loading">Loading cart...</div>
+                    <!-- Cart items will be loaded here -->
+                </div>
+                
+                <div class="cart-summary" id="cart-summary">
+                    <div class="summary-card">
+                        <h3>Order Summary</h3>
+                        <div class="summary-row">
+                            <span>Subtotal:</span>
+                            <span id="subtotal">$0.00</span>
+                        </div>
+                        <div class="summary-row">
+                            <span>Shipping:</span>
+                            <span id="shipping">$0.00</span>
+                        </div>
+                        <div class="summary-row">
+                            <span>Tax:</span>
+                            <span id="tax">$0.00</span>
+                        </div>
+                        <hr>
+                        <div class="summary-row total">
+                            <span>Total:</span>
+                            <span id="total">$0.00</span>
+                        </div>
+                        
+                        <div class="checkout-actions">
+                            <button class="btn-checkout" id="checkout-btn" onclick="proceedToCheckout()">
+                                Proceed to Checkout
+                            </button>
+                            <button class="btn-continue-shopping" onclick="continueShopping()">
+                                Continue Shopping
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="empty-cart" id="empty-cart" style="display: none;">
+                <div class="empty-cart-content">
+                    <h2>Your cart is empty</h2>
+                    <p>Looks like you haven't added any items to your cart yet.</p>
+                    <button class="btn-start-shopping" onclick="continueShopping()">
+                        Start Shopping
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2024 ShopHub. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Checkout Modal -->
+    <div class="modal" id="checkout-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Checkout</h2>
+                <span class="close" onclick="closeCheckoutModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="checkout-form">
+                    <div class="form-section">
+                        <h3>Shipping Address</h3>
+                        <div class="form-group">
+                            <label for="full-name">Full Name</label>
+                            <input type="text" id="full-name" name="full_name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="address">Address</label>
+                            <input type="text" id="address" name="address" required>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="city">City</label>
+                                <input type="text" id="city" name="city" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="state">State</label>
+                                <input type="text" id="state" name="state" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="zip">ZIP Code</label>
+                                <input type="text" id="zip" name="zip_code" required>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-section">
+                        <h3>Payment Method</h3>
+                        <div class="payment-methods">
+                            <label class="payment-option">
+                                <input type="radio" name="payment_method" value="credit_card" checked>
+                                <span>Credit Card</span>
+                            </label>
+                            <label class="payment-option">
+                                <input type="radio" name="payment_method" value="paypal">
+                                <span>PayPal</span>
+                            </label>
+                            <label class="payment-option">
+                                <input type="radio" name="payment_method" value="cash_on_delivery">
+                                <span>Cash on Delivery</span>
+                            </label>
+                        </div>
+                        
+                        <div id="credit-card-fields">
+                            <div class="form-group">
+                                <label for="card-number">Card Number</label>
+                                <input type="text" id="card-number" name="card_number" placeholder="1234 5678 9012 3456">
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="expiry">Expiry Date</label>
+                                    <input type="text" id="expiry" name="expiry" placeholder="MM/YY">
+                                </div>
+                                <div class="form-group">
+                                    <label for="cvv">CVV</label>
+                                    <input type="text" id="cvv" name="cvv" placeholder="123">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="button" class="btn-cancel" onclick="closeCheckoutModal()">Cancel</button>
+                        <button type="submit" class="btn-place-order">Place Order</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/cart.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            initAuth();
+            loadCart();
+            
+            // Mobile menu toggle
+            document.querySelector('.mobile-menu-toggle').addEventListener('click', function() {
+                document.querySelector('.nav-menu').classList.toggle('active');
+            });
+
+            // Checkout form submission
+            document.getElementById('checkout-form').addEventListener('submit', handleCheckout);
+            
+            // Payment method change
+            document.querySelectorAll('input[name="payment_method"]').forEach(radio => {
+                radio.addEventListener('change', togglePaymentFields);
+            });
+        });
+
+        async function loadCart() {
+            try {
+                document.getElementById('loading').style.display = 'block';
+                
+                if (isAuthenticated()) {
+                    // Load cart from server
+                    const cart = await apiCall('/api/orders/carts/');
+                    if (cart.results && cart.results.length > 0) {
+                        const cartItems = await apiCall(`/api/orders/cart-items/?cart=${cart.results[0].id}`);
+                        displayCartItems(cartItems.results);
+                    } else {
+                        displayEmptyCart();
+                    }
+                } else {
+                    // Load cart from localStorage
+                    const localCart = getLocalCart();
+                    if (localCart.length > 0) {
+                        displayLocalCartItems(localCart);
+                    } else {
+                        displayEmptyCart();
+                    }
+                }
+                
+                document.getElementById('loading').style.display = 'none';
+            } catch (error) {
+                console.error('Error loading cart:', error);
+                document.getElementById('loading').textContent = 'Error loading cart';
+            }
+        }
+
+        function displayCartItems(items) {
+            const cartItemsContainer = document.getElementById('cart-items');
+            
+            if (items.length === 0) {
+                displayEmptyCart();
+                return;
+            }
+            
+            cartItemsContainer.innerHTML = `
+                <div class="cart-header">
+                    <div class="header-product">Product</div>
+                    <div class="header-price">Price</div>
+                    <div class="header-quantity">Quantity</div>
+                    <div class="header-total">Total</div>
+                    <div class="header-actions">Actions</div>
+                </div>
+                ${items.map(item => `
+                    <div class="cart-item" data-item-id="${item.id}">
+                        <div class="item-product">
+                            <img src="${item.product_image || 'images/placeholder.jpg'}" alt="${item.product_name}">
+                            <div class="product-details">
+                                <h4>${item.product_name}</h4>
+                                <p>SKU: ${item.product_sku || 'N/A'}</p>
+                            </div>
+                        </div>
+                        <div class="item-price">$${item.price}</div>
+                        <div class="item-quantity">
+                            <div class="quantity-controls">
+                                <button onclick="updateQuantity(${item.id}, ${item.quantity - 1})">-</button>
+                                <input type="number" value="${item.quantity}" min="1" 
+                                       onchange="updateQuantity(${item.id}, this.value)">
+                                <button onclick="updateQuantity(${item.id}, ${item.quantity + 1})">+</button>
+                            </div>
+                        </div>
+                        <div class="item-total">$${(item.price * item.quantity).toFixed(2)}</div>
+                        <div class="item-actions">
+                            <button class="btn-remove" onclick="removeFromCart(${item.id})">Remove</button>
+                        </div>
+                    </div>
+                `).join('')}
+            `;
+            
+            calculateTotals(items);
+            updateCartCount();
+        }
+
+        function displayLocalCartItems(items) {
+            const cartItemsContainer = document.getElementById('cart-items');
+            
+            cartItemsContainer.innerHTML = `
+                <div class="cart-header">
+                    <div class="header-product">Product</div>
+                    <div class="header-price">Price</div>
+                    <div class="header-quantity">Quantity</div>
+                    <div class="header-total">Total</div>
+                    <div class="header-actions">Actions</div>
+                </div>
+                ${items.map((item, index) => `
+                    <div class="cart-item" data-item-index="${index}">
+                        <div class="item-product">
+                            <img src="images/placeholder.jpg" alt="${item.name}">
+                            <div class="product-details">
+                                <h4>${item.name}</h4>
+                                <p>Product ID: ${item.id}</p>
+                            </div>
+                        </div>
+                        <div class="item-price">$${item.price}</div>
+                        <div class="item-quantity">
+                            <div class="quantity-controls">
+                                <button onclick="updateLocalQuantity(${index}, ${item.quantity - 1})">-</button>
+                                <input type="number" value="${item.quantity}" min="1" 
+                                       onchange="updateLocalQuantity(${index}, this.value)">
+                                <button onclick="updateLocalQuantity(${index}, ${item.quantity + 1})">+</button>
+                            </div>
+                        </div>
+                        <div class="item-total">$${(item.price * item.quantity).toFixed(2)}</div>
+                        <div class="item-actions">
+                            <button class="btn-remove" onclick="removeFromLocalCart(${index})">Remove</button>
+                        </div>
+                    </div>
+                `).join('')}
+            `;
+            
+            calculateLocalTotals(items);
+            updateCartCount();
+        }
+
+        function displayEmptyCart() {
+            document.getElementById('cart-items').style.display = 'none';
+            document.getElementById('cart-summary').style.display = 'none';
+            document.getElementById('empty-cart').style.display = 'block';
+        }
+
+        function calculateTotals(items) {
+            const subtotal = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            const shipping = subtotal > 100 ? 0 : 10; // Free shipping over $100
+            const tax = subtotal * 0.08; // 8% tax
+            const total = subtotal + shipping + tax;
+            
+            document.getElementById('subtotal').textContent = `$${subtotal.toFixed(2)}`;
+            document.getElementById('shipping').textContent = `$${shipping.toFixed(2)}`;
+            document.getElementById('tax').textContent = `$${tax.toFixed(2)}`;
+            document.getElementById('total').textContent = `$${total.toFixed(2)}`;
+        }
+
+        function calculateLocalTotals(items) {
+            const subtotal = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            const shipping = subtotal > 100 ? 0 : 10;
+            const tax = subtotal * 0.08;
+            const total = subtotal + shipping + tax;
+            
+            document.getElementById('subtotal').textContent = `$${subtotal.toFixed(2)}`;
+            document.getElementById('shipping').textContent = `$${shipping.toFixed(2)}`;
+            document.getElementById('tax').textContent = `$${tax.toFixed(2)}`;
+            document.getElementById('total').textContent = `$${total.toFixed(2)}`;
+        }
+
+        async function updateQuantity(itemId, newQuantity) {
+            if (newQuantity < 1) return;
+            
+            try {
+                await apiCall(`/api/orders/cart-items/${itemId}/`, {
+                    method: 'PATCH',
+                    body: JSON.stringify({ quantity: parseInt(newQuantity) })
+                });
+                loadCart();
+            } catch (error) {
+                console.error('Error updating quantity:', error);
+                alert('Error updating quantity');
+            }
+        }
+
+        function updateLocalQuantity(index, newQuantity) {
+            if (newQuantity < 1) return;
+            
+            const cart = getLocalCart();
+            cart[index].quantity = parseInt(newQuantity);
+            localStorage.setItem('cart', JSON.stringify(cart));
+            loadCart();
+        }
+
+        async function removeFromCart(itemId) {
+            if (!confirm('Are you sure you want to remove this item?')) return;
+            
+            try {
+                await apiCall(`/api/orders/cart-items/${itemId}/`, {
+                    method: 'DELETE'
+                });
+                loadCart();
+            } catch (error) {
+                console.error('Error removing item:', error);
+                alert('Error removing item');
+            }
+        }
+
+        function removeFromLocalCart(index) {
+            if (!confirm('Are you sure you want to remove this item?')) return;
+            
+            const cart = getLocalCart();
+            cart.splice(index, 1);
+            localStorage.setItem('cart', JSON.stringify(cart));
+            loadCart();
+        }
+
+        function continueShopping() {
+            window.location.href = 'index.html';
+        }
+
+        function proceedToCheckout() {
+            if (!isAuthenticated()) {
+                alert('Please login to proceed with checkout');
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            document.getElementById('checkout-modal').style.display = 'block';
+        }
+
+        function closeCheckoutModal() {
+            document.getElementById('checkout-modal').style.display = 'none';
+        }
+
+        function togglePaymentFields() {
+            const paymentMethod = document.querySelector('input[name="payment_method"]:checked').value;
+            const creditCardFields = document.getElementById('credit-card-fields');
+            
+            if (paymentMethod === 'credit_card') {
+                creditCardFields.style.display = 'block';
+            } else {
+                creditCardFields.style.display = 'none';
+            }
+        }
+
+        async function handleCheckout(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const orderData = {
+                shipping_address: {
+                    full_name: formData.get('full_name'),
+                    address: formData.get('address'),
+                    city: formData.get('city'),
+                    state: formData.get('state'),
+                    zip_code: formData.get('zip_code')
+                },
+                payment_method: formData.get('payment_method')
+            };
+            
+            if (orderData.payment_method === 'credit_card') {
+                orderData.payment_details = {
+                    card_number: formData.get('card_number'),
+                    expiry: formData.get('expiry'),
+                    cvv: formData.get('cvv')
+                };
+            }
+            
+            try {
+                const order = await apiCall('/api/orders/orders/', {
+                    method: 'POST',
+                    body: JSON.stringify(orderData)
+                });
+                
+                alert('Order placed successfully!');
+                closeCheckoutModal();
+                window.location.href = `orders.html?order=${order.id}`;
+            } catch (error) {
+                console.error('Error placing order:', error);
+                alert('Error placing order. Please try again.');
+            }
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('checkout-modal');
+            if (event.target === modal) {
+                closeCheckoutModal();
+            }
+        }
+    </script>
+</body>
+</html>
+
