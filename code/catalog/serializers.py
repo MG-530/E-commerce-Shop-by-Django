@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Category, Discount, Product, Comment, Bundle, BundleProduct
+from .models import Category, Discount, Product, Comment, Bundle, BundleProduct, UserDiscount
 
 class CategorySerializer(serializers.ModelSerializer):
     # Serializer for the Category model.
@@ -25,16 +25,20 @@ class CommentSerializer(serializers.ModelSerializer):
         model = Comment
         fields = '__all__'
 
+class BundleSerializer(serializers.ModelSerializer):
+    # Serializer for the Bundle model.
+    class Meta:
+        model = Bundle
+        fields = '__all__'
+
 class BundleProductSerializer(serializers.ModelSerializer):
     # Serializer for the BundleProduct model.
     class Meta:
         model = BundleProduct
         fields = '__all__'
 
-class BundleSerializer(serializers.ModelSerializer):
-    # Serializer for the Bundle model.
-    products = BundleProductSerializer(many=True, read_only=True, source='bundleproduct_set')
-    
+class UserDiscountSerializer(serializers.ModelSerializer):
+    # Serializer for the UserDiscount model.
     class Meta:
-        model = Bundle
+        model = UserDiscount
         fields = '__all__'
