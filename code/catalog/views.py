@@ -50,3 +50,11 @@ class UserDiscountViewSet(viewsets.ModelViewSet):
     queryset = UserDiscount.objects.all()
     serializer_class = UserDiscountSerializer
     permission_classes = [IsAdminUser]
+    
+class ProductViewSet(viewsets.ModelViewSet):
+    queryset = Product.objects.all()
+    serializer_class = ProductSerializer
+
+class CategoryViewSet(viewsets.ModelViewSet):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
