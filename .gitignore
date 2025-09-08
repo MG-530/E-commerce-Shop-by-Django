@@ -1,7 +1,10 @@
 # Python
 __init__.py
 __pycache__/
-*/migrations/*
+*/migrations/
+*/migrations/*.py
+*/migrations/*.pyc
+
 *.py[cod]
 *$py.class
 *.so
