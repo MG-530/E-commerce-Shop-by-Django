@@ -1,9 +1,11 @@
 # Python
 __init__.py
 __pycache__/
-*/migrations/
+*/migrations/*
 */migrations/*.py
 */migrations/*.pyc
+
+db.sqlite3
 
 *.py[cod]
 *$py.class
