@@ -3,9 +3,14 @@ from .models import Category, Discount, Product, Comment, Bundle, BundleProduct,
 
 class CategorySerializer(serializers.ModelSerializer):
     # Serializer for the Category model.
+    products_count = serializers.SerializerMethodField()
+    
     class Meta:
         model = Category
-        fields = '__all__'
+        fields = ['id', 'name', 'description', 'parent_category', 'products_count']
+    
+    def get_products_count(self, obj):
+        return obj.products.count()
 
 class DiscountSerializer(serializers.ModelSerializer):
     # Serializer for the Discount model.
