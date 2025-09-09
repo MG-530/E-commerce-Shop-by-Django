@@ -49,6 +49,8 @@ class Product(ProductCommon):
     sku = models.CharField(max_length=50, unique=True)
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='products')
     discount = models.ForeignKey(Discount, on_delete=models.SET_NULL, null=True, blank=True)
+    image = models.ImageField(upload_to='products/', null=True, blank=True)
+    image_url = models.URLField(max_length=500, null=True, blank=True, help_text="External image URL")
 
     def __str__(self):
         return self.product_name
