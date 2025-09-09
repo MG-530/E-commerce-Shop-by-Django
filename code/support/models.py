@@ -4,10 +4,11 @@ from django.conf import settings
 class Ticket(models.Model):
     # Model for support tickets.
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='tickets')
-    type = models.CharField(max_length=50)
+    type = models.CharField(max_length=50, default='general')
     title = models.CharField(max_length=255)
-    status = models.CharField(max_length=50)
-    priority = models.CharField(max_length=50)
+    description = models.TextField()
+    status = models.CharField(max_length=50, default='open')
+    priority = models.CharField(max_length=50, default='medium')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
