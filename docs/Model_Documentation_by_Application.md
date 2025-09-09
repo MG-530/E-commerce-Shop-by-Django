@@ -15,10 +15,11 @@ Manages all user-related data, including authentication and user profiles.
 **Models:**
 
 * **User**: Central user model extending Django's `AbstractUser`.
-  **Fields:** `username`, `email`, `password`, `first_name`, `last_name`, `phone_number`, `birthday`, `account_status`
+  **Fields:** `User_ID` (PK), `email` (unique), `password`, `first_name`, `last_name`, `phone_number`, `role`, `account_status`, `birthday`
+  **Note:** Username field is disabled; email is used for authentication
 
 * **Address**: Stores user addresses.
-  **Fields:** `user` (FK → User), `street`, `city`, `state`, `zip_code`
+  **Fields:** `Address_ID` (PK), `user` (FK → User), `street`, `city`, `state`, `zip_code`
 
 ---
 
@@ -101,13 +102,13 @@ Manages third-party vendors and their products.
 **Models:**
 
 * **Vendor**: Represents a seller.
-  **Fields:** `Vendor_ID` (PK, FK → User), `Shop_Name`, `Description`, `Rating`, `status`
+  **Fields:** `user` (OneToOneField → User, PK), `shop_name`, `description`, `rating`, `status`
 
 * **VendorProduct**: Links products to vendors.
-  **Fields:** `Vendor_ID` (PK, FK → Vendor), `Product_ID` (PK, FK → Product)
+  **Fields:** `vendor` (FK → Vendor), `product` (FK → Product)
 
 * **VendorReview**: User reviews for vendors.
-  **Fields:** `Review_ID` (PK), `Vendor` (FK → Vendor), `User` (FK → User), `Rating`, `Comment`
+  **Fields:** `id` (PK), `vendor` (FK → Vendor), `user` (FK → User), `rating`, `comment`
 
 ---
 
@@ -149,9 +150,9 @@ Handles product return processes.
 **Models:**
 
 * **ReturnRequest**: Initiates a return request.
-  **Fields:** `order` (FK → Order), `user` (FK → User), `status`, `Reason`, `Refund_amount`, `Tracking_Number`, `shipment_status`
+  **Fields:** `id` (PK), `order` (FK → Order), `user` (FK → User), `status`, `reason`, `refund_amount`, `tracking_number`, `shipment_status`
 
 * **ReturnItem**: Specifies items being returned.
-  **Fields:** `Return_ID` (PK, FK → ReturnRequest), `Order_Item_ID` (PK, FK → OrderItem), `Quantity`, `status`, `Price_adjustment`, `Description`
+  **Fields:** `id` (PK), `return_request` (FK → ReturnRequest), `order_item` (FK → OrderItem), `quantity`, `status`, `price_adjustment`, `description`
 
 
