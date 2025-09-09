@@ -74,7 +74,17 @@ class OrderSerializer(serializers.ModelSerializer):
     items = OrderItemSerializer(many=True, read_only=True, source='orderitem_set')
     payments = PaymentSerializer(many=True, read_only=True)
     shipments = ShipmentSerializer(many=True, read_only=True)
+    order_number = serializers.SerializerMethodField()
+    items_count = serializers.SerializerMethodField()
+    total_amount = serializers.DecimalField(source='total_price', max_digits=10, decimal_places=2)
+    created_at = serializers.DateTimeField(source='order_date')
 
     class Meta:
         model = Order
-        fields = ('id', 'user', 'order_date', 'total_price', 'status', 'items', 'payments', 'shipments')
+        fields = ('id', 'order_number', 'user', 'created_at', 'total_amount', 'status', 'items_count', 'items', 'payments', 'shipments')
+
+    def get_order_number(self, obj):
+        return str(obj.id)
+    
+    def get_items_count(self, obj):
+        return obj.orderitem_set.count()
