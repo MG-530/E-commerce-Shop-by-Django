@@ -21,11 +21,22 @@ class CartViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin, mixins.Cre
 class CartItemViewSet(viewsets.ModelViewSet):
     # ViewSet for cart items.
     serializer_class = CartItemSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]  # Keep authentication required for security
     
     def get_queryset(self):
         # Ensure a user can only access their own cart items.
         return CartItem.objects.filter(cart__user=self.request.user)
+    
+    def create(self, request, *args, **kwargs):
+        """
+        Custom create method to provide better error messages for authentication issues.
+        """
+        if not request.user.is_authenticated:
+            return Response(
+                {"error": "Authentication required. Please log in to add items to cart."},
+                status=status.HTTP_401_UNAUTHORIZED
+            )
+        return super().create(request, *args, **kwargs)
 
 class OrderViewSet(viewsets.ModelViewSet):
     # ViewSet for a user's orders.
