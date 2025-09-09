@@ -24,25 +24,20 @@ All API endpoints are prefixed with `/api/`. Protected endpoints require a **JWT
 
 ### 2.1 Authentication
 
+Protected endpoints use DRF Token Authentication.
+
+**Login**
 **Endpoint:** `/api/users/api-token-auth/`
 **Method:** POST
-**Description:** Authenticates a user and returns a JWT token.
 
-**Request Body:**
-
+Request:
 ```json
-{
-  "email": "user@example.com",
-  "password": "yourpassword"
-}
+{ "username": "user", "password": "yourpassword" }
 ```
 
-**Response Body:**
-
+Response:
 ```json
-{
-  "token": "9944b09199c62bcf9418ad846dd0e4bbdfc6ee4b"
-}
+{ "token": "<token>" }
 ```
 
 ---
@@ -75,12 +70,58 @@ All API endpoints are prefixed with `/api/`. Protected endpoints require a **JWT
 
 | Endpoint                   | Method    | Description                                                |
 | -------------------------- | --------- | ---------------------------------------------------------- |
-| `/api/orders/carts/`       | GET, POST | Get the current user's cart or create a new one            |
-| `/api/orders/cart-items/`  | GET, POST | List all items in the cart or add a new item               |
+| `/api/orders/carts/`       | GET       | Get or create the current user's cart (singleton)          |
+| `/api/orders/cart-items/`  | GET, POST | List items in the cart or add a new item                   |
 | `/api/orders/orders/`      | GET, POST | List all orders for the current user or create a new order |
 | `/api/orders/orders/<id>/` | GET       | Retrieve a specific order by ID                            |
 | `/api/orders/payments/`    | GET, POST | Get a list of payments or add a new payment                |
 | `/api/orders/shipments/`   | GET, POST | Get a list of shipments or add a new shipment              |
+| `/api/orders/purchase/create_order_from_cart/` | POST | Create an order from cart, reduce inventory, clear cart |
+
+#### 2.4.1 Cart Item Payloads
+
+Add to cart (POST `/api/orders/cart-items/`):
+```json
+{ "product_id": 123, "quantity": 2 }
+```
+
+Response item shape:
+```json
+{
+  "id": 1,
+  "cart": 10,
+  "product": { "id": 123, "product_name": "Laptop", "price": 1200.0 },
+  "quantity": 2,
+  "total_price": 2400.0
+}
+```
+
+Cart response (GET `/api/orders/carts/`):
+```json
+{
+  "id": 10,
+  "user": 5,
+  "items": [ /* Cart items as above */ ],
+  "total_amount": 2400.0,
+  "item_count": 1
+}
+```
+
+Notes:
+- Re-adding the same product increments its quantity.
+- All cart endpoints require `Authorization: Token <token>`.
+
+#### 2.4.2 Purchase
+
+POST `/api/orders/purchase/create_order_from_cart/`
+
+Validation errors (400):
+```json
+{ "error": "Cart is empty." }
+{ "error": "Inventory not found for <product_name>" }
+{ "error": "Not enough stock for <product_name>" }
+{ "error": "User has no address on file." }
+```
 
 ---
 
