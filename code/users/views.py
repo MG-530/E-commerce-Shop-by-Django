@@ -70,6 +70,46 @@ class UserViewSet(viewsets.ModelViewSet):
         
         return Response({'message': 'Password changed successfully'}, status=status.HTTP_200_OK)
 
+    @action(detail=False, methods=['get'], permission_classes=[IsAuthenticated])
+    def dashboard_stats(self, request):
+        """
+        Get dashboard statistics for the current user.
+        """
+        from orders.models import Order
+        from wishlist.models import WishlistItem
+        from support.models import Ticket
+        
+        user = request.user
+        
+        # Get order statistics
+        total_orders = Order.objects.filter(user=user).count()
+        pending_orders = Order.objects.filter(user=user, status='pending').count()
+        
+        # Get wishlist items count
+        try:
+            wishlist_items = WishlistItem.objects.filter(user=user).count()
+        except:
+            wishlist_items = 0
+        
+        # Get addresses count
+        addresses_count = Address.objects.filter(user=user).count()
+        
+        # Get open support tickets count
+        try:
+            open_tickets = Ticket.objects.filter(user=user, status='open').count()
+        except:
+            open_tickets = 0
+        
+        stats = {
+            'total_orders': total_orders,
+            'pending_orders': pending_orders,
+            'wishlist_items': wishlist_items,
+            'addresses_count': addresses_count,
+            'open_tickets': open_tickets,
+        }
+        
+        return Response(stats)
+
 class AddressViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows user addresses to be viewed or edited.

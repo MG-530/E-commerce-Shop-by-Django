@@ -9,6 +9,7 @@ urlpatterns = [
     path('', include(router.urls)),
     path('me/', UserViewSet.as_view({'get': 'me', 'patch': 'me'}), name='user-me'),
     path('change-password/', UserViewSet.as_view({'post': 'change_password'}), name='user-change-password'),
+    path('dashboard-stats/', UserViewSet.as_view({'get': 'dashboard_stats'}), name='user-dashboard-stats'),
     path('api-token-auth/', LoginView.as_view(), name='api-token-auth'),
     path('register/', RegisterView.as_view(), name='user-register'),
 ]
