@@ -10,6 +10,7 @@ django-filter==25.1
 djangorestframework==3.16.1
 djangorestframework_simplejwt==5.5.1
 idna==3.10
+pillow==11.3.0
 PyJWT==2.10.1
 requests==2.32.5
 rest-framework-simplejwt==0.0.2
