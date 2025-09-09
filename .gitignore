@@ -30,10 +30,10 @@ media/
 staticfiles/
 
 # Ignore all migration files except __init__.py
-*/migrations/*.py
+**/migrations/*.py
 !*/migrations/__init__.py
-*/migrations/*.pyc
-*/migrations/__pycache__/
+**/migrations/*.pyc
+**/migrations/__pycache__/
 
 # Virtual Environments
 venv/
