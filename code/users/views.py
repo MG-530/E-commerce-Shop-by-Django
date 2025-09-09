@@ -1,40 +1,79 @@
 from rest_framework import viewsets
-from rest_framework.permissions import IsAuthenticated
-from .models import User, Address
-from .serializers import UserSerializer, AddressSerializer, AuthTokenSerializer
 from rest_framework.authtoken.views import ObtainAuthToken
-from rest_framework.views import APIView
-from rest_framework.authtoken.models import Token
+from rest_framework.settings import api_settings
+from rest_framework import generics, status
 from rest_framework.response import Response
-from rest_framework import status
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
+from rest_framework.decorators import action
+from .models import User, Address
+from .serializers import UserSerializer, AddressSerializer, AuthTokenSerializer, RegisterSerializer
+from .permissions import IsOwnerOrAdmin, IsAddressOwner
+from django.contrib.auth import get_user_model
 
 class UserViewSet(viewsets.ModelViewSet):
-    # ViewSet for handling user data.
-    queryset = User.objects.all()
+    """
+    API endpoint that allows users to be viewed or edited.
+    """
+    queryset = User.objects.all().order_by("-date_joined")
     serializer_class = UserSerializer
-
-class AddressViewSet(viewsets.ModelViewSet):
-    # ViewSet for handling user addresses.
-    queryset = Address.objects.all()
-    serializer_class = AddressSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsOwnerOrAdmin]
 
     def get_queryset(self):
-        # Ensure users can only see their own addresses.
-        return self.queryset.filter(user=self.request.user)
+        """
+        Filter queryset based on user permissions.
+        Regular users can only see their own profile.
+        Admin users can see all users.
+        """
+        if self.request.user.is_staff:
+            return User.objects.all().order_by("-date_joined")
+        return User.objects.filter(id=self.request.user.id)
+
+    @action(detail=False, methods=['get'], permission_classes=[IsAuthenticated])
+    def me(self, request):
+        """
+        Get current user's profile.
+        """
+        serializer = self.get_serializer(request.user)
+        return Response(serializer.data)
+
+class AddressViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows user addresses to be viewed or edited.
+    """
+    queryset = Address.objects.all()
+    serializer_class = AddressSerializer
+    permission_classes = [IsAuthenticated, IsAddressOwner]
+
+    def get_queryset(self):
+        """
+        Filter addresses to only show the current user's addresses.
+        """
+        # If explicitly requested, always return only current user's addresses
+        mine = self.request.query_params.get('mine')
+        if mine is not None:
+            return Address.objects.filter(user=self.request.user)
+        if self.request.user.is_staff:
+            return Address.objects.all()
+        return Address.objects.filter(user=self.request.user)
 
     def perform_create(self, serializer):
-        # Automatically associate new addresses with the current user.
+        """
+        Set the user field to the current user when creating an address.
+        """
         serializer.save(user=self.request.user)
 
-class CustomAuthToken(APIView):
-    def post(self, request, *args, **kwargs):
-        serializer = AuthTokenSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        user = serializer.validated_data['user']
-        token, created = Token.objects.get_or_create(user=user)
-        return Response({
-            'token': token.key,
-            'user_id': user.id,
-            'email': user.email
-        }, status=status.HTTP_200_OK)
+class LoginView(ObtainAuthToken):
+    """
+    Handles user login and token authentication using email and password.
+    """
+    serializer_class = AuthTokenSerializer
+    renderer_classes = api_settings.DEFAULT_RENDERER_CLASSES
+
+class RegisterView(generics.CreateAPIView):
+    """
+    Handles user registration and account creation.
+    """
+    queryset = get_user_model().objects.all()
+    serializer_class = RegisterSerializer
+
+

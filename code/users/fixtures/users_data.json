@@ -5,7 +5,6 @@
     "fields": {
       "password": "pbkdf2_sha256$260000$8T3Z2W6H5S4S6M5F$e+fA4B3C2D1E5F6G7H8I9J0K1L2M3N4O5P6Q7R8S9T0U1V2W3X4Y5Z6",
       "is_superuser": true,
-      "username": "admin",
       "first_name": "Admin",
       "last_name": "User",
       "email": "admin@example.com",
@@ -24,7 +23,6 @@
     "fields": {
       "password": "pbkdf2_sha256$260000$8T3Z2W6H5S4S6M5F$e+fA4B3C2D1E5F6G7H8I9J0K1L2M3N4O5P6Q7R8S9T0U1V2W3X4Y5Z6",
       "is_superuser": false,
-      "username": "testuser",
       "first_name": "Test",
       "last_name": "User",
       "email": "testuser@example.com",
