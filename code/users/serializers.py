@@ -30,10 +30,12 @@ class AuthTokenSerializer(serializers.Serializer):
             raise serializers.ValidationError('Must include "email" and "password".')
 
 class UserSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField(source='User_ID', read_only=True)
+    
     class Meta:
         model = User
-        fields = ['email', 'first_name', 'last_name', 'phone_number', 'role', 'account_status', 'birthday']
-        read_only_fields = ['email']
+        fields = ['id', 'User_ID', 'email', 'first_name', 'last_name', 'phone_number', 'role', 'account_status', 'birthday', 'date_joined']
+        read_only_fields = ['id', 'User_ID', 'email', 'date_joined']
 
 class AddressSerializer(serializers.ModelSerializer):
     class Meta:
