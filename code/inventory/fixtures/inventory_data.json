@@ -1,0 +1,23 @@
+[
+  {
+    "model": "inventory.warehouse",
+    "pk": 1,
+    "fields": {
+      "Name": "Main Warehouse",
+      "Location": "HQ",
+      "status": "active"
+    }
+  },
+  {
+    "model": "inventory.productinventory",
+    "pk": 1,
+    "fields": {
+      "product": 1,
+      "warehouse": 1,
+      "Quantity": 50,
+      "Minimum_Quantity": 1,
+      "Maximum_Quantity": 1000,
+      "status": "in_stock"
+    }
+  }
+]
