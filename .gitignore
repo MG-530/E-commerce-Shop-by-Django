@@ -4,9 +4,7 @@ __pycache__/
 */migrations/*
 */migrations/*.py
 */migrations/*.pyc
-
-db.sqlite3
-
+**/migrations/
 *.py[cod]
 *$py.class
 *.so
@@ -30,6 +28,7 @@ wheels/
 # Django
 *.log
 local_settings.py
+db.sqlite3
 db.sqlite3-journal
 media/
 staticfiles/
