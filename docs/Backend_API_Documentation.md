@@ -32,7 +32,7 @@ Protected endpoints use DRF Token Authentication.
 
 Request:
 ```json
-{ "username": "user", "password": "yourpassword" }
+{ "email": "user@example.com", "password": "yourpassword" }
 ```
 
 Response:
@@ -46,6 +46,7 @@ Response:
 
 | Endpoint                     | Method           | Description                                              |
 | ---------------------------- | ---------------- | -------------------------------------------------------- |
+| `/api/users/register/`       | POST             | Register a new user account                              |
 | `/api/users/users/`          | GET              | Retrieve all users (admin only)                          |
 | `/api/users/users/<id>/`     | GET, PUT, DELETE | Retrieve, update, or delete a specific user (admin only) |
 | `/api/users/addresses/`      | GET              | Retrieve a list of user addresses                        |
@@ -63,6 +64,7 @@ Response:
 | `/api/catalog/discounts/`     | GET, POST        | List all discounts or create a new one         |
 | `/api/catalog/comments/`      | GET, POST        | List all comments or create a new one          |
 | `/api/catalog/bundles/`       | GET, POST        | List all product bundles                       |
+| `/api/catalog/bundle-products/` | GET, POST      | Manage products within bundles                 |
 
 ---
 
@@ -127,13 +129,36 @@ Validation errors (400):
 
 ### 2.5 Other Modules
 
+#### 2.5.1 Inventory
+| Endpoint                         | Method    | Description                                         |
+| -------------------------------- | --------- | --------------------------------------------------- |
+| `/api/inventory/warehouses/`     | GET, POST | List all warehouses or create a new one             |
+| `/api/inventory/inventories/`    | GET, POST | Manage product inventory in warehouses              |
+| `/api/inventory/transactions/`   | GET, POST | Track inventory movements and transactions          |
+
+#### 2.5.2 Vendor
+| Endpoint                         | Method    | Description                                         |
+| -------------------------------- | --------- | --------------------------------------------------- |
+| `/api/vendors/vendors/`          | GET, POST | List all vendors or create a new vendor             |
+| `/api/vendors/vendor-products/`  | GET, POST | Manage vendor-product relationships                 |
+| `/api/vendors/vendor-reviews/`   | GET, POST | Manage vendor reviews and ratings                   |
+
+#### 2.5.3 Support
 | Endpoint                     | Method    | Description                                         |
 | ---------------------------- | --------- | --------------------------------------------------- |
-| `/api/inventory/warehouses/` | GET, POST | List all warehouses or create a new one             |
 | `/api/support/tickets/`      | GET, POST | List user's tickets or create a new one             |
-| `/api/vendors/vendors/`      | GET       | List all vendors                                    |
+| `/api/support/messages/`     | GET, POST | Manage messages within support tickets              |
+
+#### 2.5.4 Wishlist
+| Endpoint                     | Method    | Description                                         |
+| ---------------------------- | --------- | --------------------------------------------------- |
 | `/api/wishlist/items/`       | GET, POST | List items in the user's wishlist or add a new item |
+
+#### 2.5.5 Returns
+| Endpoint                     | Method    | Description                                         |
+| ---------------------------- | --------- | --------------------------------------------------- |
 | `/api/returns/requests/`     | GET, POST | List user's return requests or create a new one     |
+| `/api/returns/items/`        | GET, POST | Manage items within return requests                 |
 
 ---
 

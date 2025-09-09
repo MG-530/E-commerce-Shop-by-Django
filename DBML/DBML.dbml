@@ -8,9 +8,10 @@ Table User {
   first_name varchar
   last_name varchar
   phone_number varchar
-  role varchar
-  account_status varchar
+  role varchar [default: 'customer']
+  account_status varchar [default: 'active']
   birthday date
+  Note: 'username field is disabled, email is used for authentication'
 }
 
 Table Address {
@@ -117,22 +118,21 @@ Table Order_Item {
 
 // Shipment
 Table Shipment {
-  Shipment_ID int [pk]
-  Order_ID int [ref: > Order.Order_ID]
+  id int [pk]
+  order_id int [ref: > Order.Order_ID]
   shipment_date timestamp
   carrier varchar
-  tracking_number varchar
+  tracking_number varchar [unique]
   status varchar
-  Shipment_Address_ID int [ref: > Address.Address_ID]
 }
 
 // Payment
 Table Payment {
-  Payment_ID int [pk]
-  Order_ID int [ref: > Order.Order_ID]
+  id int [pk]
+  order_id int [ref: > Order.Order_ID]
   payment_date timestamp
   payment_method varchar
-  transaction_id varchar
+  transaction_id varchar [unique]
   amount decimal
 }
 
@@ -165,23 +165,24 @@ Table Comment {
 
 // Returns
 Table Return_Request {
-  Return_ID int [pk]
-  Order_ID int [ref: > Order.Order_ID]
-  User_ID int [ref: > User.User_ID]
+  id int [pk]
+  order_id int [ref: > Order.Order_ID]
+  user_id int [ref: > User.User_ID]
   status varchar
-  Reason text
-  Refund_amount decimal
-  Tracking_Number varchar
+  reason text
+  refund_amount decimal
+  tracking_number varchar
   shipment_status varchar
 }
 
 Table Return_Item {
-  Return_ID int [pk, ref: > Return_Request.Return_ID]
-  Order_Item_ID int [pk, ref: > Order_Item.Order_Item_ID]
-  Quantity int
+  id int [pk]
+  return_request_id int [ref: > Return_Request.id]
+  order_item_id int [ref: > Order_Item.Order_Item_ID]
+  quantity int
   status varchar
-  Price_adjustment decimal
-  Description text
+  price_adjustment decimal
+  description text
 }
 
 // Bundles
@@ -201,24 +202,24 @@ Table Bundle_Product {
 
 // Vendor
 Table Vendor {
-  Vendor_ID int [pk, ref: > User.User_ID]
-  Shop_Name varchar
-  Description text
-  Rating decimal
+  user_id int [pk, ref: - User.User_ID]
+  shop_name varchar
+  description text
+  rating decimal [default: 0.00]
   status varchar
 }
 
 Table Vendor_Product {
-  Vendor_ID int [pk, ref: > Vendor.Vendor_ID]
-  Product_ID int [pk, ref: > Product.Product_ID]
+  vendor_id int [pk, ref: > Vendor.user_id]
+  product_id int [pk, ref: > Product.Product_ID]
 }
 
 Table Vendor_Review {
-  Review_ID int [pk]
-  Vendor_ID int [ref: > Vendor.Vendor_ID]
-  User_ID int [ref: > User.User_ID]
-  Rating decimal
-  Comment text
+  id int [pk]
+  vendor_id int [ref: > Vendor.user_id]
+  user_id int [ref: > User.User_ID]
+  rating decimal
+  comment text
 }
 
 // Support Tickets
