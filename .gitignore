@@ -53,3 +53,8 @@ ENV/
 .DS_Store
 Thumbs.db
 */__init__.py
+
+DBML/DBML.png
+DBML/DBML.svg
+code/products/*
+
