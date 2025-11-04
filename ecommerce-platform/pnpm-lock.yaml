@@ -1775,7 +1775,7 @@ packages:
     resolution: {integrity: sha512-FQN4MRfuJeHf7cBbBMJFXhKSDq+2kAArBlmRBvcvFE5BB1HZKXtSFASDhdlz9zOYwxh8lDdnvmMOe/+5cdoEdg==}
     engines: {node: '>= 0.8'}
 
-  cookie@0.6.0:
+  cookie@0.7.0:
     resolution: {integrity: sha512-U71cyTamuh1CRNCfpGY6to28lxvNwPG4Guz/EVjgf3Jmzv0vlDp1atT9eS5dDjMYHucpHbWns6Lwf3BKz6svdw==}
     engines: {node: '>= 0.6'}
 
@@ -3627,7 +3627,7 @@ snapshots:
       '@standard-schema/spec': 1.0.0
       '@sveltejs/acorn-typescript': 1.0.6(acorn@8.15.0)
       '@sveltejs/vite-plugin-svelte': 6.2.1(svelte@5.42.3)(vite@7.1.12(@types/node@22.18.12)(jiti@2.6.1)(lightningcss@1.30.2))
-      '@types/cookie': 0.6.0
+      '@types/cookie': 0.7.0
       acorn: 8.15.0
       cookie: 0.6.0
       devalue: 5.4.2
@@ -3924,7 +3924,7 @@ snapshots:
     dependencies:
       delayed-stream: 1.0.0
 
-  cookie@0.6.0: {}
+  cookie@0.7.0: {}
 
   cookie@0.7.2: {}
 
