@@ -3,7 +3,7 @@ certifi==2025.8.3
 charset-normalizer==3.4.3
 dj-rest-auth==7.0.1
 Django==5.2.9
-django-allauth==65.11.1
+django-allauth==65.13.0
 django-cors-headers==4.7.0
 django-extensions==4.1
 django-filter==25.1
