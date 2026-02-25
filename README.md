@@ -40,30 +40,45 @@ A comprehensive, full-featured e-commerce platform built with **Django** and **D
 - CSS3
 - Vanilla JavaScript
 
-## ⚡ Quick Start
+
+
+## ⚡ Quick Start (with npm)
 
 ### Prerequisites
 
-- Python 3.13.x
-- pip (Python package installer)
+- Python 3.11 – 3.13
+- Node.js 18+ (recommended: Node 20 LTS)
+- npm
 - Git
+
+Check versions:
+```bash
+python3 --version
+node -v
+npm -v
+git --version
+```
+
+---
 
 ### 1. Clone Repository
 
 ```bash
-git clone https://github.com/MG-530/Database-project-by-Django.git
-cd Database-project-by-Django
+git clone https://github.com/MG-530/E-commerce-Shop-by-Django.git
+cd E-commerce-Shop-by-Django
 ```
 
-### 2. Backend Setup
+---
 
-Navigate to the code directory and set up the Django backend:
+### 2. Backend Setup (Django)
+
+Go to the backend directory:
 
 ```bash
-cd code
+cd backend
 ```
 
-Create and activate a virtual environment:
+Create and activate virtual environment:
 
 ```bash
 # Linux/macOS
@@ -75,45 +90,65 @@ python -m venv venv
 venv\Scripts\activate
 ```
 
-### 3. Install Dependencies
+Install dependencies:
 
 ```bash
+pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
-### 4. Database Setup
-
-Create and apply database migrations:
+Apply migrations:
 
 ```bash
 python manage.py makemigrations
 python manage.py migrate
 ```
 
-### 5. Create Admin User
+Create admin user (optional):
 
 ```bash
 python manage.py createsuperuser
 ```
 
-### 6. Start Backend Server
+Run backend server:
 
 ```bash
 python manage.py runserver
 ```
 
-The backend API will be available at: `http://127.0.0.1:8000/`
+Backend API:
 
-### 7. Start Frontend Server
-
-Open a new terminal and navigate to the frontend directory:
-
-```bash
-cd ../frontend
-python3 -m http.server 8080
+```
+http://127.0.0.1:8000/
 ```
 
-The frontend will be available at: `http://localhost:8080`
+---
+
+## 3. Frontend Setup (npm)
+
+Open a new terminal and go to the frontend directory:
+
+```bash
+cd frontend
+```
+
+Install frontend dependencies:
+
+```bash
+npm install
+```
+
+Run development server:
+
+```bash
+npm run dev
+```
+
+Frontend will be available at:
+
+```
+http://localhost:3000
+```
 
 ## 📚 API Documentation
 
